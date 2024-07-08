@@ -105,4 +105,5 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
-MAX_STRING_IN_DATABASE: int = 200
+MAX_NAME_LENGTH: int = 256
+MAX_SLUG_LENGTH: int = 50

@@ -1,3 +1,5 @@
+"""Настройки приложения."""
+
 from django.apps import AppConfig  # type: ignore
 
 
