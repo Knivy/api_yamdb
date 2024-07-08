@@ -5,42 +5,43 @@ from django.conf import settings  # type: ignore
 User = get_user_model()
 
 
-class BaseNameModel(models.Model):
-    """Базовая модель с полем имени."""
+class Category(models.Model):
+    """Категории."""
 
     name = models.CharField(max_length=settings.MAX_STRING_IN_DATABASE,
                             verbose_name='Название')
-
-    def __str__(self):
-        return self.name
- 
-
-class BaseSlugModel(models.Model):
-    """Базовая модель с полем слага."""
-
     slug = models.SlugField(unique=True,
                             verbose_name='Слаг')
-
-
-class Category(BaseNameModel, BaseSlugModel):
-    """Категории."""
 
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
+    def __str__(self):
+        return self.name
 
-class Genre(BaseNameModel, BaseSlugModel):
+
+class Genre(models.Model):
     """Жанры."""
+
+    name = models.CharField(max_length=settings.MAX_STRING_IN_DATABASE,
+                            verbose_name='Название')
+    slug = models.SlugField(unique=True,
+                            verbose_name='Слаг')
 
     class Meta:
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
 
+    def __str__(self):
+        return self.name
 
-class Title(BaseNameModel):
+
+class Title(models.Model):
     """Произведения искусства."""
 
+    name = models.CharField(max_length=settings.MAX_STRING_IN_DATABASE,
+                            verbose_name='Название')
     year = models.PositiveSmallIntegerField(verbose_name='Год')
     description = models.TextField(blank=True, null=True,
                                    verbose_name='Описание')
@@ -55,3 +56,6 @@ class Title(BaseNameModel):
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
         ordering = ('name',)
+
+    def __str__(self):
+        return self.name
