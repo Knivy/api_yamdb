@@ -7,8 +7,8 @@ from rest_framework.permissions import IsAuthenticated  # type: ignore
 from django.contrib.auth import get_user_model  # type: ignore
 from django.http import JsonResponse  # type: ignore
 
-from reviews.models import Category
-from .serializers import (CategorySerializer,)
+from reviews.models import Category, Genre
+from .serializers import (CategorySerializer, GenreSerializer)
 from .permissions import AdminOrReadOnlyPermission
 
 User = get_user_model()
@@ -22,3 +22,15 @@ class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = (AdminOrReadOnlyPermission,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    lookup_field = 'slug'  # Чтобы адрес был вида /categories/{slug}/
+
+
+class GenreViewSet(viewsets.ModelViewSet):
+    """Обработка жанров."""
+
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = (AdminOrReadOnlyPermission,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
