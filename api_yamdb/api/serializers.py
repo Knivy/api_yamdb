@@ -3,9 +3,8 @@
 from rest_framework import serializers  # type: ignore
 from rest_framework.relations import SlugRelatedField  # type: ignore
 from django.contrib.auth import get_user_model  # type: ignore
-from rest_framework.validators import UniqueTogetherValidator  # type: ignore
 
-from reviews.models import Category, Genre, Title
+from reviews.models import Category, Genre, Title, Review, Comment
 
 User = get_user_model()
 
@@ -59,3 +58,31 @@ class TitleReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = ('id', 'name', 'year', 'description', 'category', 'genre')
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    """Сериализатор обзоров."""
+
+    author = SlugRelatedField(
+        slug_field='username',
+        read_only=True,
+    )
+
+    class Meta:
+        model = Review
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        read_only_fields = ('id', 'author', 'pub_date')
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    """Сериализатор комментариев."""
+
+    author = SlugRelatedField(
+        slug_field='username',
+        read_only=True,
+    )
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'text', 'author', 'pub_date')
+        read_only_fields = ('id', 'author', 'pub_date')
