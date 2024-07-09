@@ -2,7 +2,8 @@
 
 from django.db import models  # type: ignore
 from django.contrib.auth import get_user_model  # type: ignore
-from django.conf import settings  # type: ignore
+from api_yamdb.constants import (MAX_NAME_LENGTH, MAX_SLUG_LENGTH,
+                                 MIN_SCORE, MAX_SCORE)
 
 User = get_user_model()
 
@@ -10,7 +11,7 @@ User = get_user_model()
 class BaseNameModel(models.Model):
     """Базовая модель с именем."""
 
-    name = models.CharField(max_length=settings.MAX_NAME_LENGTH,
+    name = models.CharField(max_length=MAX_NAME_LENGTH,
                             verbose_name='Название')
 
     class Meta:
@@ -23,7 +24,7 @@ class BaseNameModel(models.Model):
 class BaseSlugModel(models.Model):
     """Базовая модель со слагом."""
 
-    slug = models.SlugField(unique=True, max_length=settings.MAX_SLUG_LENGTH,
+    slug = models.SlugField(unique=True, max_length=MAX_SLUG_LENGTH,
                             verbose_name='Слаг')
 
     class Meta:
@@ -83,8 +84,8 @@ class Review(BaseTextModel):
     """Отзывы."""
 
     score = models.PositiveSmallIntegerField(
-        choices=tuple((i, str(i)) for i in range(settings.MIN_SCORE,
-                                                 settings.MAX_SCORE + 1)),
+        choices=tuple((i, str(i)) for i in range(MIN_SCORE,
+                                                 MAX_SCORE + 1)),
         verbose_name='Оценка')
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='reviews',
