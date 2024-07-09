@@ -21,7 +21,7 @@ class BaseNameModel(models.Model):
 
 
 class BaseSlugModel(models.Model):
-    """Базовая модель с слагом."""
+    """Базовая модель со слагом."""
 
     slug = models.SlugField(unique=True, max_length=settings.MAX_SLUG_LENGTH,
                             verbose_name='Слаг')
