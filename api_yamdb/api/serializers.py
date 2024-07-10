@@ -3,6 +3,7 @@
 from rest_framework import serializers  # type: ignore
 from rest_framework.relations import SlugRelatedField  # type: ignore
 from django.contrib.auth import get_user_model  # type: ignore
+import numpy as np
 
 from reviews.models import Category, Genre, Title, Review, Comment
 
@@ -39,10 +40,16 @@ class TitleWriteSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         many=True,
     )
+    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Title
-        fields = ('name', 'year', 'description', 'category', 'genre')
+        fields = ('name', 'year', 'description', 'category', 'genre', 'rating')
+
+    def get_rating(self, obj):
+        """Расчёт рейтинга."""
+        return np.mean((score for score
+                        in obj.reviews.values_list('score', flat=True)))
 
 
 class TitleReadSerializer(serializers.ModelSerializer):
