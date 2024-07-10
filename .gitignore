@@ -51,7 +51,6 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
-migrations/
 
 # Translations
 *.mo
@@ -150,3 +149,5 @@ dmypy.json
 # папки со статикой и медиа
 media/
 
+# миграции
+migrations/
