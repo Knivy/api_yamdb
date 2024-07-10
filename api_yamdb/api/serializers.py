@@ -40,31 +40,30 @@ class TitleWriteSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         many=True,
     )
-    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Title
-        fields = ('name', 'year', 'description', 'category', 'genre', 'rating')
-
-    def get_rating(self, obj):
-        """Расчёт рейтинга."""
-        return np.mean((score for score
-                        in obj.reviews.values_list('score', flat=True)))
+        fields = ('name', 'year', 'description', 'category', 'genre')
 
 
 class TitleReadSerializer(serializers.ModelSerializer):
     """Сериализатор произведений на чтение."""
 
-    # Надо еще добавить rating.
-
     category = CategorySerializer()
     genre = GenreSerializer(
         many=True,
     )
+    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', 'description', 'category', 'genre')
+        fields = ('id', 'name', 'year', 'description',
+                  'category', 'genre', 'rating')
+
+    def get_rating(self, obj):
+        """Расчёт рейтинга."""
+        return np.mean((score for score
+                        in obj.reviews.values_list('score', flat=True)))
 
 
 class ReviewSerializer(serializers.ModelSerializer):
