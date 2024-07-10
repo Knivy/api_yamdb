@@ -1,46 +1,56 @@
 """Модели."""
 
 from django.db import models  # type: ignore
-from django.conf import settings  # type: ignore
+from django.contrib.auth import get_user_model  # type: ignore
+from .constants import (MAX_NAME_LENGTH, MAX_SLUG_LENGTH,
+                        MIN_SCORE, MAX_SCORE)
 
 
-class Category(models.Model):
-    """Категории."""
+User = get_user_model()
 
-    name = models.CharField(max_length=settings.MAX_NAME_LENGTH,
+
+class BaseNameModel(models.Model):
+    """Базовая модель с именем."""
+
+    name = models.CharField(max_length=MAX_NAME_LENGTH,
                             verbose_name='Название')
-    slug = models.SlugField(unique=True, max_length=settings.MAX_SLUG_LENGTH,
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.name
+
+
+class BaseNameSlugModel(BaseNameModel):
+    """Базовая модель с именем и слагом."""
+
+    slug = models.SlugField(unique=True, max_length=MAX_SLUG_LENGTH,
                             verbose_name='Слаг')
+
+    class Meta:
+        abstract = True
+
+
+class Category(BaseNameSlugModel):
+    """Категории."""
 
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
-    def __str__(self):
-        return self.name
 
-
-class Genre(models.Model):
+class Genre(BaseNameSlugModel):
     """Жанры."""
-
-    name = models.CharField(max_length=settings.MAX_NAME_LENGTH,
-                            verbose_name='Название')
-    slug = models.SlugField(unique=True, max_length=settings.MAX_SLUG_LENGTH,
-                            verbose_name='Слаг')
 
     class Meta:
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
 
-    def __str__(self):
-        return self.name
 
-
-class Title(models.Model):
+class Title(BaseNameModel):
     """Произведения искусства."""
 
-    name = models.CharField(max_length=settings.MAX_NAME_LENGTH,
-                            verbose_name='Название')
     year = models.PositiveSmallIntegerField(verbose_name='Год')
     description = models.TextField(blank=True, null=True,
                                    verbose_name='Описание')
@@ -56,5 +66,52 @@ class Title(models.Model):
         verbose_name_plural = 'Произведения'
         ordering = ('name',)
 
+
+class BaseTextModel(models.Model):
+    """Базовая текстовая модель."""
+
+    text = models.TextField(verbose_name='Текст')
+    pub_date = models.DateTimeField(verbose_name='Дата публикации',
+                                    auto_now_add=True)
+
+    class Meta:
+        abstract = True
+
     def __str__(self):
-        return self.name
+        return self.text
+
+
+class Review(BaseTextModel):
+    """Отзывы."""
+
+    score = models.PositiveSmallIntegerField(
+        choices=tuple((i, str(i)) for i in range(MIN_SCORE,
+                                                 MAX_SCORE + 1)),
+        verbose_name='Оценка')
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='reviews',
+        verbose_name='Автор')
+    title = models.ForeignKey(
+        Title, on_delete=models.CASCADE, related_name='reviews',
+        verbose_name='Произведение')
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+        ordering = ('pub_date',)
+
+
+class Comment(BaseTextModel):
+    """Комментарии."""
+
+    review = models.ForeignKey(
+        Review, on_delete=models.CASCADE, related_name='comments',
+        verbose_name='Отзыв')
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='comments',
+        verbose_name='Автор')
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+        ordering = ('pub_date',)
