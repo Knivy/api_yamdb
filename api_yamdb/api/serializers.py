@@ -45,6 +45,10 @@ class TitleWriteSerializer(serializers.ModelSerializer):
         model = Title
         fields = ('name', 'year', 'description', 'genre', 'category')
 
+    def to_representation(self, instance):
+        """Представление объекта."""
+        return TitleReadSerializer().to_representation(instance)
+
 
 class TitleReadSerializer(serializers.ModelSerializer):
     """Сериализатор произведений на чтение."""
@@ -62,8 +66,9 @@ class TitleReadSerializer(serializers.ModelSerializer):
 
     def get_rating(self, obj):
         """Расчёт рейтинга."""
-        return np.mean((score for score
-                        in obj.reviews.values_list('score', flat=True)))
+        scores = obj.reviews.values_list('score', flat=True)
+        return int(np.mean((score for score
+                           in scores))) if scores else 0
 
 
 class ReviewSerializer(serializers.ModelSerializer):
