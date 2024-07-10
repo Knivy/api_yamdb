@@ -53,7 +53,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     """Обработка произведений."""
 
     queryset = Title.objects.all()
-    permission_classes = (AdminOrReadOnlyPermission,)
+    #permission_classes = (AdminOrReadOnlyPermission,)
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('name', 'year',
                         'genre__slug', 'category__slug')
