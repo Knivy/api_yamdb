@@ -1,10 +1,7 @@
 """Модели."""
 
 from django.db import models  # type: ignore
-from django.contrib.auth import get_user_model  # type: ignore
 from django.conf import settings  # type: ignore
-
-User = get_user_model()
 
 
 class Category(models.Model):
