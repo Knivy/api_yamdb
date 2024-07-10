@@ -21,8 +21,8 @@ class BaseNameModel(models.Model):
         return self.name
 
 
-class BaseSlugModel(models.Model):
-    """Базовая модель со слагом."""
+class BaseNameSlugModel(BaseNameModel):
+    """Базовая модель с именем и слагом."""
 
     slug = models.SlugField(unique=True, max_length=MAX_SLUG_LENGTH,
                             verbose_name='Слаг')
@@ -31,7 +31,7 @@ class BaseSlugModel(models.Model):
         abstract = True
 
 
-class Category(BaseNameModel, BaseSlugModel):
+class Category(BaseNameSlugModel):
     """Категории."""
 
     class Meta:
@@ -39,7 +39,7 @@ class Category(BaseNameModel, BaseSlugModel):
         verbose_name_plural = 'Категории'
 
 
-class Genre(BaseNameModel, BaseSlugModel):
+class Genre(BaseNameSlugModel):
     """Жанры."""
 
     class Meta:
