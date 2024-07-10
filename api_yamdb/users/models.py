@@ -1,9 +1,10 @@
 """Модель пользователя."""
 
-from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.db import models  # type: ignore
+from django.contrib.auth.models import AbstractUser  # type: ignore
 
-from .constants import EMAIL_MAX_LENGTH, NAME_MAX_LENGTH, ROLE_CHOICES
+from .constants import (EMAIL_MAX_LENGTH, NAME_MAX_LENGTH,
+                        ROLE_CHOICES, ROLE_MAX_LENGTH)
 
 
 class YamdbUser(AbstractUser):
@@ -39,6 +40,7 @@ class YamdbUser(AbstractUser):
     role = models.CharField(
         verbose_name='Роль',
         choices=ROLE_CHOICES,
+        max_length=ROLE_MAX_LENGTH,
         default='user',
     )
 
