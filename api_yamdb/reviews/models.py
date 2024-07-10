@@ -2,8 +2,8 @@
 
 from django.db import models  # type: ignore
 from django.contrib.auth import get_user_model  # type: ignore
-from api_yamdb.constants import (MAX_NAME_LENGTH, MAX_SLUG_LENGTH,
-                                 MIN_SCORE, MAX_SCORE)
+from .constants import (MAX_NAME_LENGTH, MAX_SLUG_LENGTH,
+                        MIN_SCORE, MAX_SCORE)
 
 User = get_user_model()
 
