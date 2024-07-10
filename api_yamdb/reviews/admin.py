@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import CastomUser
+from users.models import YamdbUser
 
 UserAdmin.fieldsets += (
     ('Extra Fields', {'fields': ('bio', 'role')}),
 )
-admin.site.register(CastomUser, UserAdmin)
+admin.site.register(YamdbUser, UserAdmin)
