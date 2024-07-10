@@ -23,7 +23,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'import_export',
     'django_filters',
     'api.apps.ApiConfig',
     'reviews.apps.ReviewsConfig',
@@ -110,5 +109,3 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
 AUTH_USER_MODEL = 'users.YamdbUser'
-
-# STATIC_ROOT = BASE_DIR / 'static'
