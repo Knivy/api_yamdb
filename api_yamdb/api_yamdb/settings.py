@@ -108,7 +108,4 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
-MAX_NAME_LENGTH: int = 256
-MAX_SLUG_LENGTH: int = 50
-
 AUTH_USER_MODEL = 'users.YamdbUser'

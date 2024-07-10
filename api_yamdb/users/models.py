@@ -3,7 +3,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-from .constans import EMAIL_MAX_LENGHT, NAME_MAX_LENGHT, ROLE_CHOICES
+from .constants import EMAIL_MAX_LENGTH, NAME_MAX_LENGTH, ROLE_CHOICES
 
 
 class YamdbUser(AbstractUser):
@@ -11,23 +11,23 @@ class YamdbUser(AbstractUser):
 
     username = models.CharField(
         verbose_name='Логин',
-        max_length=NAME_MAX_LENGHT,
+        max_length=NAME_MAX_LENGTH,
         unique=True,
     )
     email = models.EmailField(
         verbose_name='Почта',
-        max_length=EMAIL_MAX_LENGHT,
+        max_length=EMAIL_MAX_LENGTH,
         unique=True,
     )
     first_name = models.CharField(
         verbose_name='Имя пользователя',
-        max_length=NAME_MAX_LENGHT,
+        max_length=NAME_MAX_LENGTH,
         blank=True,
         null=True,
     )
     last_name = models.CharField(
         verbose_name='Фамилия',
-        max_length=NAME_MAX_LENGHT,
+        max_length=NAME_MAX_LENGTH,
         blank=True,
         null=True,
     )
