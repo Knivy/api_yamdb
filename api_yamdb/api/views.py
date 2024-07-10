@@ -20,13 +20,13 @@ User = get_user_model()
 class PermissionsMixin(viewsets.ModelViewSet):
     """Миксин разрешений."""
 
-    permission_classes = (AdminOrReadListOnlyPermission,)
+    # permission_classes = (AdminOrReadListOnlyPermission,)
 
 
 class TextPermissionsMixin(viewsets.ModelViewSet):
     """Миксин разрешений."""
 
-    permission_classes = (TextPermission,)
+    # permission_classes = (TextPermission,)
 
 
 class CategoryViewSet(PermissionsMixin, viewsets.ModelViewSet):
