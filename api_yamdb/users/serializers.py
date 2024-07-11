@@ -4,7 +4,6 @@ import re
 
 from rest_framework import serializers  # type: ignore
 from django.contrib.auth import get_user_model  # type: ignore
-from rest_framework.validators import UniqueValidator  # type: ignore
 
 from .constants import NAME_MAX_LENGTH, EMAIL_MAX_LENGTH
 
@@ -65,7 +64,7 @@ class FullValidationErrorSerializer(ValidationErrorSerializer):
                 f'символов.'
             )
         return value
-    
+
     def validate_last_name(self, value):
         """Проверка фамилии."""
         if len(value) > NAME_MAX_LENGTH:

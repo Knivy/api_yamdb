@@ -15,6 +15,7 @@ from rest_framework.response import Response  # type: ignore
 from rest_framework_simplejwt.tokens import AccessToken  # type: ignore
 from django.conf import settings  # type: ignore
 from django.http import JsonResponse  # type: ignore
+from rest_framework.exceptions import ParseError  # type: ignore
 
 from reviews.models import Category, Genre, Title, Review, Comment
 from .serializers import (CategorySerializer, GenreSerializer,
@@ -25,8 +26,6 @@ from users.serializers import (UserGetOrCreationSerializer,
 from .permissions import (AdminOrReadListOnlyPermission,
                           AdminOrReadOnlyPermission, TextPermission)
 from .filters import TitleFilter
-from rest_framework.exceptions import ParseError
-from rest_framework.exceptions import ParseError
 
 User = get_user_model()
 
@@ -103,7 +102,7 @@ class ReviewViewSet(OrderingDateMixin, TextPermissionsMixin,
         serializer.save(author=self.request.user,
                         title=self.get_title(),
                         pub_date=dt.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
-        
+
     def perform_update(self, serializer):
         serializer.save()
 
