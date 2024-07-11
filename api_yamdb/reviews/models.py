@@ -17,6 +17,7 @@ class BaseNameModel(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -64,7 +65,6 @@ class Title(BaseNameModel):
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
-        ordering = ('name',)
 
 
 class BaseTextModel(models.Model):
@@ -76,6 +76,7 @@ class BaseTextModel(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ('pub_date',)
 
     def __str__(self):
         return self.text
@@ -98,7 +99,6 @@ class Review(BaseTextModel):
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
-        ordering = ('pub_date',)
 
 
 class Comment(BaseTextModel):
@@ -114,4 +114,3 @@ class Comment(BaseTextModel):
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
-        ordering = ('pub_date',)

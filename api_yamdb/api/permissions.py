@@ -14,7 +14,7 @@ class AdminOrReadListOnlyPermission(BasePermission):
             return False
         if request.method in ('POST', 'DELETE'):
             return request.user.is_admin
-        return False
+        raise MethodNotAllowed(request.method)
 
     def has_object_permission(self, request, view, obj):
         """Запрет просмотра одного объекта не-админу."""
