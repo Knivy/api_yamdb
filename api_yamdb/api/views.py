@@ -24,6 +24,7 @@ from users.serializers import (UserCreationSerializer,
                                ConfirmationCodeSerializer)
 from .permissions import (AdminOrReadListOnlyPermission,
                           AdminOrReadOnlyPermission, TextPermission)
+from .filters import TitleFilter
 
 User = get_user_model()
 
@@ -80,8 +81,9 @@ class TitleViewSet(OrderingMixin, viewsets.ModelViewSet):
     queryset = Title.objects.all()
     permission_classes = (AdminOrReadOnlyPermission,)
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('name', 'year',
-                        'genre__slug', 'category__slug')
+    # filterset_fields = ('name', 'year',
+    #                     'genre__slug', 'category__slug')
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve',):

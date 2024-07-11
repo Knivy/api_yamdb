@@ -75,8 +75,8 @@ tests/test_04_title.py::Test04TitleAPI::test_06_titles_detail_put_not_allowed PA
 tests/test_05_review.py::Test05ReviewAPI::test_01_review_not_auth PASSED [ 85%]
 tests/test_05_review.py::Test05ReviewAPI::test_02_review_post PASSED     [ 86%]
 tests/test_05_review.py::Test05ReviewAPI::test_03_review_detail_get PASSED [ 87%]
-tests/test_05_review.py::Test05ReviewAPI::test_04_review_detail_user FAILED [ 88%]
-tests/test_05_review.py::Test05ReviewAPI::test_05_reviews_detail_moderator_and_admin FAILED [ 90%]
+tests/test_05_review.py::Test05ReviewAPI::test_04_review_detail_user PASSED [ 88%]
+tests/test_05_review.py::Test05ReviewAPI::test_05_reviews_detail_moderator_and_admin PASSED [ 90%]
 tests/test_05_review.py::Test05ReviewAPI::test_06_reviews_detail_put_not_allowed PASSED [ 91%]
 tests/test_06_comment.py::Test06CommentAPI::test_01_comment_not_auth PASSED [ 92%]
 tests/test_06_comment.py::Test06CommentAPI::test_02_comment PASSED       [ 93%]
@@ -89,8 +89,8 @@ tests/test_06_comment.py::Test06CommentAPI::test_07_comment_detail_put_not_allow
 ================================== FAILURES ===================================
 ___ Test00UserRegistration.test_get_new_confirmation_code_for_existing_user ___
 
-self = <tests.test_00_user_registration.Test00UserRegistration object at 0x000002294D13E6A0>
-client = <django.test.client.Client object at 0x000002294D17ADF0>
+self = <tests.test_00_user_registration.Test00UserRegistration object at 0x000001F04D6B31C0>
+client = <django.test.client.Client object at 0x000001F04D6860D0>
 
     def test_get_new_confirmation_code_for_existing_user(self, client):
         valid_data = {
@@ -120,9 +120,9 @@ tests\test_00_user_registration.py:351: AssertionError
 WARNING  django.request:log.py:224 Bad Request: /api/v1/auth/signup/
 _ Test00UserRegistration.test_get_confirmation_code_for_user_created_by_admin _
 
-self = <tests.test_00_user_registration.Test00UserRegistration object at 0x000002294D0F0970>
-admin_client = <rest_framework.test.APIClient object at 0x000002294D202760>
-client = <django.test.client.Client object at 0x000002294D202910>
+self = <tests.test_00_user_registration.Test00UserRegistration object at 0x000001F04D6415B0>
+admin_client = <rest_framework.test.APIClient object at 0x000001F04D613880>
+client = <django.test.client.Client object at 0x000001F04D752640>
 django_user_model = <class 'users.models.YamdbUser'>
 
     def test_get_confirmation_code_for_user_created_by_admin(
@@ -156,9 +156,9 @@ tests\test_00_user_registration.py:373: AssertionError
 WARNING  django.request:log.py:224 Bad Request: /api/v1/auth/signup/
 _____________________ Test04TitleAPI.test_02_title_admin ______________________
 
-self = <tests.test_04_title.Test04TitleAPI object at 0x000002294D349850>
-admin_client = <rest_framework.test.APIClient object at 0x000002294D0BC700>
-client = <django.test.client.Client object at 0x000002294D17ADC0>
+self = <tests.test_04_title.Test04TitleAPI object at 0x000001F04D699D00>
+admin_client = <rest_framework.test.APIClient object at 0x000001F04D9007F0>
+client = <django.test.client.Client object at 0x000001F04D898C70>
 
     def test_02_title_admin(self, admin_client, client):
         genres = create_genre(admin_client)
@@ -307,97 +307,8 @@ tests\test_04_title.py:161: AssertionError
 ------------------------------ Captured log call ------------------------------
 WARNING  django.request:log.py:224 Bad Request: /api/v1/titles/
 WARNING  django.request:log.py:224 Bad Request: /api/v1/titles/
-_________________ Test05ReviewAPI.test_04_review_detail_user __________________
-
-self = <tests.test_05_review.Test05ReviewAPI object at 0x000002294D16A220>
-admin_client = <rest_framework.test.APIClient object at 0x000002291DAAB880>
-admin = <YamdbUser: TestAdmin>, user = <YamdbUser: TestUser>
-user_client = <rest_framework.test.APIClient object at 0x000002291DAB7DF0>
-moderator = <YamdbUser: TestModerator>
-moderator_client = <rest_framework.test.APIClient object at 0x000002291DAB74F0>
-
-    def test_04_review_detail_user(self, admin_client, admin, user,
-                                   user_client, moderator, moderator_client):
-        author_map = {
-            admin: admin_client,
-            user: user_client,
-            moderator: moderator_client
-        }
-        reviews, titles = create_reviews(admin_client, author_map)
-        new_data = {
-            'text': 'Top score',
-            'score': 10
-        }
-        user_review_url = self.REVIEW_DETAIL_URL_TEMPLATE.format(
-            title_id=titles[0]['id'], review_id=reviews[1]['id']
-        )
-    
-        response = user_client.patch(user_review_url, data=new_data)
->       assert response.status_code == HTTPStatus.OK, (
-            'Проверьте, что PATCH-запрос пользователя с ролью `user` к его '
-            f'собственному отзыву через `{self.REVIEW_DETAIL_URL_TEMPLATE}` '
-            'возвращает ответ со статусом 200.'
-        )
-E       AssertionError: Проверьте, что PATCH-запрос пользователя с ролью `user` к его собственному отзыву через `/api/v1/titles/{title_id}/reviews/{review_id}/` возвращает ответ со статусом 200.
-E       assert 400 == <HTTPStatus.OK: 200>
-E         +400
-E         -<HTTPStatus.OK: 200>
-
-tests\test_05_review.py:276: AssertionError
------------------------------- Captured log call ------------------------------
-WARNING  django.request:log.py:224 Bad Request: /api/v1/titles/17/reviews/11/
-_________ Test05ReviewAPI.test_05_reviews_detail_moderator_and_admin __________
-
-self = <tests.test_05_review.Test05ReviewAPI object at 0x000002294D2C15E0>
-admin_client = <rest_framework.test.APIClient object at 0x000002291DA99E20>
-admin = <YamdbUser: TestAdmin>
-user_client = <rest_framework.test.APIClient object at 0x000002294D2E3C40>
-user = <YamdbUser: TestUser>
-moderator_client = <rest_framework.test.APIClient object at 0x000002294D2E3130>
-moderator = <YamdbUser: TestModerator>
-
-    def test_05_reviews_detail_moderator_and_admin(self, admin_client, admin,
-                                                   user_client, user,
-                                                   moderator_client,
-                                                   moderator):
-        author_map = {
-            admin: admin_client,
-            user: user_client,
-            moderator: moderator_client
-        }
-        reviews, titles = create_reviews(admin_client, author_map)
-        new_data = {
-            'text': 'Top score',
-            'score': 10
-        }
-    
-        for idx, (client, role) in enumerate((
-                (moderator_client, 'модератора'),
-                (admin_client, 'администратора')
-        ), 1):
-            response = client.patch(
-                self.REVIEW_DETAIL_URL_TEMPLATE.format(
-                    title_id=titles[0]['id'], review_id=reviews[idx]['id']
-                ),
-                data=new_data
-            )
->           assert response.status_code == HTTPStatus.OK, (
-                f'Проверьте, что PATCH-запросе {role} к  чужому отзыву через '
-                f'`{self.REVIEW_DETAIL_URL_TEMPLATE}` возвращает ответ со '
-                'статусом 200.'
-            )
-E           AssertionError: Проверьте, что PATCH-запросе модератора к  чужому отзыву через `/api/v1/titles/{title_id}/reviews/{review_id}/` возвращает ответ со статусом 200.
-E           assert 400 == <HTTPStatus.OK: 200>
-E             +400
-E             -<HTTPStatus.OK: 200>
-
-tests\test_05_review.py:370: AssertionError
------------------------------- Captured log call ------------------------------
-WARNING  django.request:log.py:224 Bad Request: /api/v1/titles/19/reviews/14/
 =========================== short test summary info ===========================
 FAILED tests/test_00_user_registration.py::Test00UserRegistration::test_get_new_confirmation_code_for_existing_user
 FAILED tests/test_00_user_registration.py::Test00UserRegistration::test_get_confirmation_code_for_user_created_by_admin
 FAILED tests/test_04_title.py::Test04TitleAPI::test_02_title_admin - Assertio...
-FAILED tests/test_05_review.py::Test05ReviewAPI::test_04_review_detail_user
-FAILED tests/test_05_review.py::Test05ReviewAPI::test_05_reviews_detail_moderator_and_admin
-======================== 5 failed, 75 passed in 25.15s ========================
+======================== 3 failed, 77 passed in 24.99s ========================
