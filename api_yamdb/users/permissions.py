@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission  # type: ignore
+from rest_framework.permissions import IsAuthenticated  # type: ignore
 
 
 class AdminOnlyPermission(BasePermission):
@@ -11,3 +12,15 @@ class AdminOnlyPermission(BasePermission):
         if not request.user.is_authenticated:
             return False
         return request.user.is_admin
+
+
+class AuthenticatedOnlyPermission(IsAuthenticated):
+    """Только  для аутентифицированных."""
+
+    def has_permission(self, request, view):
+        """Проверка."""
+        if not request.user.is_authenticated:
+            return False
+        if request.method not in ('GET', 'PATCH'):
+            return False
+        return True
