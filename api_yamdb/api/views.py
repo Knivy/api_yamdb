@@ -20,11 +20,13 @@ from reviews.models import Category, Genre, Title, Review, Comment
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleReadSerializer, TitleWriteSerializer,
                           ReviewSerializer, CommentSerializer)
-from users.serializers import (UserCreationSerializer,
+from users.serializers import (UserGetOrCreationSerializer,
                                ConfirmationCodeSerializer)
 from .permissions import (AdminOrReadListOnlyPermission,
                           AdminOrReadOnlyPermission, TextPermission)
 from .filters import TitleFilter
+from rest_framework.exceptions import ParseError
+from rest_framework.exceptions import ParseError
 
 User = get_user_model()
 
@@ -81,8 +83,6 @@ class TitleViewSet(OrderingMixin, viewsets.ModelViewSet):
     queryset = Title.objects.all()
     permission_classes = (AdminOrReadOnlyPermission,)
     filter_backends = (DjangoFilterBackend,)
-    # filterset_fields = ('name', 'year',
-    #                     'genre__slug', 'category__slug')
     filterset_class = TitleFilter
 
     def get_serializer_class(self):
@@ -143,13 +143,27 @@ class CommentViewSet(OrderingDateMixin, TextPermissionsMixin,
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def send_confirmation_code(request):
-    serializer = UserCreationSerializer(data=request.data)
+    serializer = UserGetOrCreationSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
     email = serializer.data['email']
     username = serializer.data['username']
 
-    user, created = User.objects.get_or_create(email=email, username=username)
+    users = User.objects.filter(email=email)
+    user = None
+    if users:
+        user = users[0]
+        if user.username != username:
+            raise ParseError('Емайл уже существует.')
+    else:
+        users = User.objects.filter(username=username)
+        if users:
+            user = users[0]
+            if user.email != email:
+                raise ParseError('Имя пользователя уже существует.')
+    if not user:
+        user, created = User.objects.get_or_create(email=email,
+                                                   username=username)
 
     confirmation_code = default_token_generator.make_token(user)
 

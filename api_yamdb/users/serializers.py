@@ -32,12 +32,31 @@ class ValidationErrorSerializer(serializers.Serializer):
                 f'Длина логина не должна превышать '
                 f'{NAME_MAX_LENGTH} символов.'
             )
-        if not re.fullmatch(r'^[\w.@+-]+\Z$', value):  # r'^[\w\d\.@+-]+$'
+        if not re.fullmatch(r'^[\w\d\.@+-]+$', value):
             raise serializers.ValidationError(
                 'Логин содержит недопустимые символы.'
             )
         return value
-    
+
+    def validate_email(self, value):
+        """Проверка email."""
+        if not value:
+            raise serializers.ValidationError(
+                'Email не может быть пустым.'
+            )
+        if len(value) > EMAIL_MAX_LENGTH:
+            raise serializers.ValidationError(
+                'Email слишком длинный.'
+            )
+        return value
+
+
+class FullValidationErrorSerializer(ValidationErrorSerializer):
+    """Сериализатор ошибок валидации."""
+
+    class Meta:
+        abstract = True
+
     def validate_first_name(self, value):
         """Проверка имени."""
         if len(value) > NAME_MAX_LENGTH:
@@ -55,21 +74,10 @@ class ValidationErrorSerializer(serializers.Serializer):
                 f'символов.'
             )
         return value
-    
-    def validate_email(self, value):
-        """Проверка email."""
-        if not value:
-            raise serializers.ValidationError(
-                'Email не может быть пустым.'
-            )
-        if len(value) > EMAIL_MAX_LENGTH:
-            raise serializers.ValidationError(
-                'Email слишком длинный.'
-            )
-        return value
 
 
-class UserSerializer(ValidationErrorSerializer, serializers.ModelSerializer):
+class UserSerializer(FullValidationErrorSerializer,
+                     serializers.ModelSerializer):
     """Сериализатор пользователей."""
 
     class Meta:
@@ -86,15 +94,25 @@ class SingleUserSerializer(UserSerializer):
         read_only_fields = ('role',)
 
 
-class UserCreationSerializer(ValidationErrorSerializer,
-                             serializers.Serializer):
+# class UserCreationSerializer(ValidationErrorSerializer,
+#                              serializers.Serializer):
+#     email = serializers.EmailField(
+#         required=True,
+#         validators=[UniqueValidator(queryset=User.objects.all())]
+#     )
+#     username = serializers.CharField(
+#         required=True,
+#         validators=[UniqueValidator(queryset=User.objects.all())]
+#     )
+
+
+class UserGetOrCreationSerializer(ValidationErrorSerializer,
+                                  serializers.Serializer):
     email = serializers.EmailField(
         required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())]
     )
     username = serializers.CharField(
         required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())]
     )
 
 
