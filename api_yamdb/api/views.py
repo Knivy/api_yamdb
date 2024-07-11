@@ -113,10 +113,7 @@ class CommentViewSet(TextPermissionsMixin, viewsets.ModelViewSet):
     def get_review(self):
         """Получение отзыва."""
         review_id = self.kwargs.get('review_id')
-        try:
-            return get_object_or_404(Review, id=review_id)
-        except Exception as error:
-            raise ParseError(detail=error)
+        return get_object_or_404(Review, id=review_id)
 
     def get_queryset(self):
         """Выбор комментариев."""
