@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated  # type: ignore
 
 from .serializers import UserSerializer, SingleUserSerializer
 from .permissions import AdminOnlyPermission
+
 User = get_user_model()
 
 

@@ -16,7 +16,9 @@ class AdminOrReadListOnlyPermission(BasePermission):
             return request.user.is_admin
         if view.action == 'retrieve':
             raise MethodNotAllowed(request.method)
-        return False
+        if request.method in ('PATCH',) and request.user.is_user:
+            return False
+        raise MethodNotAllowed(request.method)
 
 
 class AdminOrReadOnlyPermission(BasePermission):

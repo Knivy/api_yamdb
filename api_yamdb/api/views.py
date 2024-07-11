@@ -24,7 +24,6 @@ from users.serializers import (UserCreationSerializer,
                                ConfirmationCodeSerializer)
 from .permissions import (AdminOrReadListOnlyPermission,
                           AdminOrReadOnlyPermission, TextPermission)
-from rest_framework.exceptions import ParseError
 
 User = get_user_model()
 
