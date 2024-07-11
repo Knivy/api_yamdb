@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission  # type: ignore
 from rest_framework.permissions import IsAuthenticated  # type: ignore
+from rest_framework.exceptions import MethodNotAllowed  # type: ignore
 
 
 class AdminOnlyPermission(BasePermission):
@@ -22,5 +23,5 @@ class AuthenticatedOnlyPermission(IsAuthenticated):
         if not request.user.is_authenticated:
             return False
         if request.method not in ('GET', 'PATCH'):
-            return False
+            raise MethodNotAllowed(request.method)
         return True

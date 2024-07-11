@@ -14,7 +14,7 @@ class AdminOrReadListOnlyPermission(BasePermission):
             return False
         if request.method in ('POST',):
             return request.user.is_admin
-        raise MethodNotAllowed(request.method)
+        return False
 
     def has_object_permission(self, request, view, obj):
         """Запрет просмотра одного объекта не-админу."""
@@ -43,7 +43,7 @@ class TextPermission(BasePermission):
         if request.method in SAFE_METHODS:
             return True
         if request.method in ('PUT',):
-            return False
+            raise MethodNotAllowed(request.method)
         return request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):

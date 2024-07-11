@@ -68,7 +68,7 @@ class TitleReadSerializer(serializers.ModelSerializer):
         """Расчёт рейтинга."""
         scores = obj.reviews.values_list('score', flat=True)
         return int(np.mean((score for score
-                           in scores))) if scores else 0
+                           in scores))) if scores else None
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -83,6 +83,19 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
         read_only_fields = ('id', 'author', 'pub_date')
+
+    def validate_author(self, value):
+        """Проверка автора."""
+        title_id = self.context['view'].kwargs.get('title_id')
+        if not title_id:
+            raise serializers.ValidationError('Не указано произведение.')
+        if Review.objects.filter(
+                author=value,
+                title=title_id,
+        ):
+            raise serializers.ValidationError(
+                'Допустим только один обзор на произведение.')
+        return value
 
 
 class CommentSerializer(serializers.ModelSerializer):
