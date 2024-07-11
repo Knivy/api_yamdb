@@ -1,0 +1,314 @@
+============================= test session starts =============================
+platform win32 -- Python 3.9.0, pytest-6.2.4, py-1.11.0, pluggy-0.13.1 -- f:\Python\_Dev\api_yamdb\.venv\Scripts\python.exe
+django: settings: api_yamdb.settings (from ini)
+rootdir: F:\Python\_Dev\api_yamdb\api_yamdb, configfile: pytest.ini, testpaths: tests/
+plugins: pythonpath-0.7.3, django-4.4.0
+collecting ... collected 80 items
+
+tests/test_00_user_registration.py::Test00UserRegistration::test_00_nodata_signup PASSED [  1%]
+tests/test_00_user_registration.py::Test00UserRegistration::test_00_invalid_data_signup PASSED [  2%]
+tests/test_00_user_registration.py::Test00UserRegistration::test_00_singup_length_and_simbols_validation[data0-messege0] PASSED [  3%]
+tests/test_00_user_registration.py::Test00UserRegistration::test_00_singup_length_and_simbols_validation[data1-messege1] PASSED [  5%]
+tests/test_00_user_registration.py::Test00UserRegistration::test_00_singup_length_and_simbols_validation[data2-messege2] PASSED [  6%]
+tests/test_00_user_registration.py::Test00UserRegistration::test_00_valid_data_user_signup PASSED [  7%]
+tests/test_00_user_registration.py::Test00UserRegistration::test_00_valid_data_admin_create_user PASSED [  8%]
+tests/test_00_user_registration.py::Test00UserRegistration::test_00_admin_create_user_length_and_simbols_validation[data0-messege0] PASSED [ 10%]
+tests/test_00_user_registration.py::Test00UserRegistration::test_00_admin_create_user_length_and_simbols_validation[data1-messege1] PASSED [ 11%]
+tests/test_00_user_registration.py::Test00UserRegistration::test_00_admin_create_user_length_and_simbols_validation[data2-messege2] PASSED [ 12%]
+tests/test_00_user_registration.py::Test00UserRegistration::test_00_admin_create_user_length_and_simbols_validation[data3-messege3] PASSED [ 13%]
+tests/test_00_user_registration.py::Test00UserRegistration::test_00_admin_create_user_length_and_simbols_validation[data4-messege4] PASSED [ 15%]
+tests/test_00_user_registration.py::Test00UserRegistration::test_00_obtain_jwt_token_invalid_data PASSED [ 16%]
+tests/test_00_user_registration.py::Test00UserRegistration::test_00_registration_me_username_restricted PASSED [ 17%]
+tests/test_00_user_registration.py::Test00UserRegistration::test_00_registration_same_email_restricted PASSED [ 18%]
+tests/test_00_user_registration.py::Test00UserRegistration::test_get_new_confirmation_code_for_existing_user FAILED [ 20%]
+tests/test_00_user_registration.py::Test00UserRegistration::test_get_confirmation_code_for_user_created_by_admin FAILED [ 21%]
+tests/test_01_users.py::Test01UserAPI::test_01_users_not_authenticated PASSED [ 22%]
+tests/test_01_users.py::Test01UserAPI::test_02_users_username_not_authenticated PASSED [ 23%]
+tests/test_01_users.py::Test01UserAPI::test_03_users_me_not_authenticated PASSED [ 25%]
+tests/test_01_users.py::Test01UserAPI::test_04_users_get_admin PASSED    [ 26%]
+tests/test_01_users.py::Test01UserAPI::test_04_02_users_get_search PASSED [ 27%]
+tests/test_01_users.py::Test01UserAPI::test_04_01_users_get_admin_only PASSED [ 28%]
+tests/test_01_users.py::Test01UserAPI::test_05_01_users_post_admin_bad_requests PASSED [ 30%]
+tests/test_01_users.py::Test01UserAPI::test_05_02_users_post_admin_user_creation[data0-] PASSED [ 31%]
+tests/test_01_users.py::Test01UserAPI::test_05_02_users_post_admin_user_creation[data1-без указания роли нового пользователя ] PASSED [ 32%]
+tests/test_01_users.py::Test01UserAPI::test_05_03_users_post_response_has_data PASSED [ 33%]
+tests/test_01_users.py::Test01UserAPI::test_05_04_users_post_user_superuser PASSED [ 35%]
+tests/test_01_users.py::Test01UserAPI::test_06_users_username_get_admin PASSED [ 36%]
+tests/test_01_users.py::Test01UserAPI::test_06_users_username_get_not_admin PASSED [ 37%]
+tests/test_01_users.py::Test01UserAPI::test_07_01_users_username_patch_admin PASSED [ 38%]
+tests/test_01_users.py::Test01UserAPI::test_07_02_users_username_patch_moderator PASSED [ 40%]
+tests/test_01_users.py::Test01UserAPI::test_07_03_users_username_patch_user PASSED [ 41%]
+tests/test_01_users.py::Test01UserAPI::test_07_05_users_username_put_not_allowed PASSED [ 42%]
+tests/test_01_users.py::Test01UserAPI::test_08_01_users_username_delete_admin PASSED [ 43%]
+tests/test_01_users.py::Test01UserAPI::test_08_02_users_username_delete_moderator PASSED [ 45%]
+tests/test_01_users.py::Test01UserAPI::test_08_03_users_username_delete_user PASSED [ 46%]
+tests/test_01_users.py::Test01UserAPI::test_08_04_users_username_delete_superuser PASSED [ 47%]
+tests/test_01_users.py::Test01UserAPI::test_09_users_me_get PASSED       [ 48%]
+tests/test_01_users.py::Test01UserAPI::test_09_02_users_me_delete_not_allowed PASSED [ 50%]
+tests/test_01_users.py::Test01UserAPI::test_10_01_users_me_patch PASSED  [ 51%]
+tests/test_01_users.py::Test01UserAPI::test_10_02_users_me_has_field_validation[data0-messege0] PASSED [ 52%]
+tests/test_01_users.py::Test01UserAPI::test_10_02_users_me_has_field_validation[data1-messege1] PASSED [ 53%]
+tests/test_01_users.py::Test01UserAPI::test_10_02_users_me_has_field_validation[data2-messege2] PASSED [ 55%]
+tests/test_01_users.py::Test01UserAPI::test_10_02_users_me_has_field_validation[data3-messege3] PASSED [ 56%]
+tests/test_01_users.py::Test01UserAPI::test_10_02_users_me_has_field_validation[data4-messege4] PASSED [ 57%]
+tests/test_01_users.py::Test01UserAPI::test_10_03_users_me_patch_change_role_not_allowed PASSED [ 58%]
+tests/test_02_category.py::Test02CategoryAPI::test_01_category_not_auth PASSED [ 60%]
+tests/test_02_category.py::Test02CategoryAPI::test_02_category_with_admin_user PASSED [ 61%]
+tests/test_02_category.py::Test02CategoryAPI::test_03_category_fields_validation[data0-massage0] PASSED [ 62%]
+tests/test_02_category.py::Test02CategoryAPI::test_03_category_fields_validation[data1-massage1] PASSED [ 63%]
+tests/test_02_category.py::Test02CategoryAPI::test_03_category_fields_validation[data2-massage2] PASSED [ 65%]
+tests/test_02_category.py::Test02CategoryAPI::test_04_category_delete_admin PASSED [ 66%]
+tests/test_02_category.py::Test02CategoryAPI::test_05_category_check_permission_admin PASSED [ 67%]
+tests/test_03_genre.py::Test03GenreAPI::test_01_genre_not_auth PASSED    [ 68%]
+tests/test_03_genre.py::Test03GenreAPI::test_02_genre PASSED             [ 70%]
+tests/test_03_genre.py::Test03GenreAPI::test_03_category_fields_validation[data0-massage0] PASSED [ 71%]
+tests/test_03_genre.py::Test03GenreAPI::test_03_category_fields_validation[data1-massage1] PASSED [ 72%]
+tests/test_03_genre.py::Test03GenreAPI::test_03_category_fields_validation[data2-massage2] PASSED [ 73%]
+tests/test_03_genre.py::Test03GenreAPI::test_04_genres_delete PASSED     [ 75%]
+tests/test_03_genre.py::Test03GenreAPI::test_05_genres_check_permission PASSED [ 76%]
+tests/test_04_title.py::Test04TitleAPI::test_01_title_not_auth PASSED    [ 77%]
+tests/test_04_title.py::Test04TitleAPI::test_02_title_admin FAILED       [ 78%]
+tests/test_04_title.py::Test04TitleAPI::test_03_titles_detail PASSED     [ 80%]
+tests/test_04_title.py::Test04TitleAPI::test_04_titles_name_length_validation PASSED [ 81%]
+tests/test_04_title.py::Test04TitleAPI::test_05_titles_check_permission PASSED [ 82%]
+tests/test_04_title.py::Test04TitleAPI::test_06_titles_detail_put_not_allowed PASSED [ 83%]
+tests/test_05_review.py::Test05ReviewAPI::test_01_review_not_auth PASSED [ 85%]
+tests/test_05_review.py::Test05ReviewAPI::test_02_review_post PASSED     [ 86%]
+tests/test_05_review.py::Test05ReviewAPI::test_03_review_detail_get PASSED [ 87%]
+tests/test_05_review.py::Test05ReviewAPI::test_04_review_detail_user PASSED [ 88%]
+tests/test_05_review.py::Test05ReviewAPI::test_05_reviews_detail_moderator_and_admin PASSED [ 90%]
+tests/test_05_review.py::Test05ReviewAPI::test_06_reviews_detail_put_not_allowed PASSED [ 91%]
+tests/test_06_comment.py::Test06CommentAPI::test_01_comment_not_auth PASSED [ 92%]
+tests/test_06_comment.py::Test06CommentAPI::test_02_comment PASSED       [ 93%]
+tests/test_06_comment.py::Test06CommentAPI::test_03_comment_detail_get PASSED [ 95%]
+tests/test_06_comment.py::Test06CommentAPI::test_04_comment_detail__user_patch_delete PASSED [ 96%]
+tests/test_06_comment.py::Test06CommentAPI::test_05_comment_detail_admin_and_moderator PASSED [ 97%]
+tests/test_06_comment.py::Test06CommentAPI::test_06_comment_detail_not_auth PASSED [ 98%]
+tests/test_06_comment.py::Test06CommentAPI::test_07_comment_detail_put_not_allowed PASSED [100%]
+
+================================== FAILURES ===================================
+___ Test00UserRegistration.test_get_new_confirmation_code_for_existing_user ___
+
+self = <tests.test_00_user_registration.Test00UserRegistration object at 0x000001F04D6B31C0>
+client = <django.test.client.Client object at 0x000001F04D6860D0>
+
+    def test_get_new_confirmation_code_for_existing_user(self, client):
+        valid_data = {
+            'email': 'test_email@yamdb.fake',
+            'username': 'valid_username_1'
+        }
+        response = client.post(self.URL_SIGNUP, data=valid_data)
+        assert response.status_code == HTTPStatus.OK, (
+            'Проверьте, что POST-запрос с корректными данными, отправленный '
+            f'на эндпоинт `{self.URL_SIGNUP}`, возвращает ответ со статусом '
+            '200.'
+        )
+    
+        response = client.post(self.URL_SIGNUP, data=valid_data)
+>       assert response.status_code == HTTPStatus.OK, (
+            f'Проверьте, что повторный POST-запрос к `{self.URL_SIGNUP}` с '
+            'данными зарегистрированного пользователя возвращает ответ со '
+            'статусом 200.'
+        )
+E       AssertionError: Проверьте, что повторный POST-запрос к `/api/v1/auth/signup/` с данными зарегистрированного пользователя возвращает ответ со статусом 200.
+E       assert 400 == <HTTPStatus.OK: 200>
+E         +400
+E         -<HTTPStatus.OK: 200>
+
+tests\test_00_user_registration.py:351: AssertionError
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:224 Bad Request: /api/v1/auth/signup/
+_ Test00UserRegistration.test_get_confirmation_code_for_user_created_by_admin _
+
+self = <tests.test_00_user_registration.Test00UserRegistration object at 0x000001F04D6415B0>
+admin_client = <rest_framework.test.APIClient object at 0x000001F04D613880>
+client = <django.test.client.Client object at 0x000001F04D752640>
+django_user_model = <class 'users.models.YamdbUser'>
+
+    def test_get_confirmation_code_for_user_created_by_admin(
+            self, admin_client, client, django_user_model
+    ):
+        user_cnt = django_user_model.objects.count()
+        valid_data = {
+            'email': 'test_email@yamdb.fake',
+            'username': 'valid_username_1'
+        }
+        admin_client.post(self.URL_ADMIN_CREATE_USER, data=valid_data)
+        assert (user_cnt + 1) == django_user_model.objects.count(), (
+            'Если POST-запрос администратора на эндпоинт '
+            f'`{self.URL_ADMIN_CREATE_USER}` содержит корректные данные - '
+            'должен быть создан новый пользователь.'
+        )
+    
+        response = client.post(self.URL_SIGNUP, data=valid_data)
+>       assert response.status_code == HTTPStatus.OK, (
+            f'Проверьте, что POST-запрос к {self.URL_SIGNUP} с данными '
+            'пользователя, созданного администратором,  возвращает ответ '
+            'со статусом 200.'
+        )
+E       AssertionError: Проверьте, что POST-запрос к /api/v1/auth/signup/ с данными пользователя, созданного администратором,  возвращает ответ со статусом 200.
+E       assert 400 == <HTTPStatus.OK: 200>
+E         +400
+E         -<HTTPStatus.OK: 200>
+
+tests\test_00_user_registration.py:373: AssertionError
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:224 Bad Request: /api/v1/auth/signup/
+_____________________ Test04TitleAPI.test_02_title_admin ______________________
+
+self = <tests.test_04_title.Test04TitleAPI object at 0x000001F04D699D00>
+admin_client = <rest_framework.test.APIClient object at 0x000001F04D9007F0>
+client = <django.test.client.Client object at 0x000001F04D898C70>
+
+    def test_02_title_admin(self, admin_client, client):
+        genres = create_genre(admin_client)
+        categories = create_categories(admin_client)
+        title_count = 0
+    
+        assert_msg = (
+            f'Если POST-запрос администратора к `{self.TITLES_URL}` '
+            'содержит некорректные данные - должен вернуться ответ со '
+            'статусом 400.'
+        )
+        data = {}
+        response = admin_client.post(self.TITLES_URL, data=data)
+        assert response.status_code == HTTPStatus.BAD_REQUEST, assert_msg
+    
+        invalid_data = {
+            'name': 'Угнать за 60 секунд',
+            'year': 'дветыщи',
+            'genre': [genres[1]['slug']],
+            'category': categories[1]['slug'],
+            'description': 'Угонял машины всю ночь и немного подустал.'
+        }
+        response = admin_client.post(self.TITLES_URL, data=invalid_data)
+        assert response.status_code == HTTPStatus.BAD_REQUEST, assert_msg
+    
+        post_data_1 = {
+            'name': 'Мост через реку Квай',
+            'year': 1957,
+            'genre': [genres[0]['slug'], genres[1]['slug']],
+            'category': categories[0]['slug'],
+            'description': 'Рон Свонсон рекомендует.'
+        }
+        response = admin_client.post(self.TITLES_URL, data=post_data_1)
+        assert response.status_code == HTTPStatus.CREATED, (
+            f'Если POST-запрос администратора к `{self.TITLES_URL}` '
+            'содержит корректные данные - должен вернуться ответ со статусом '
+            '201.'
+        )
+        title_count += 1
+    
+        post_data_2 = {
+            'name': 'Хороший, плохой, злой.',
+            'year': 1966,
+            'genre': [genres[2]['slug']],
+            'category': categories[1]['slug'],
+            'description': 'Угадай ревьюера по названию фильма.'
+        }
+        response = admin_client.post(self.TITLES_URL, data=post_data_2)
+        assert response.status_code == HTTPStatus.CREATED, (
+            f'Если POST-запрос администратора к `{self.TITLES_URL}` '
+            'содержит корректные данные - должен вернуться ответ со статусом '
+            '201.'
+        )
+        title_count += 1
+        assert isinstance(response.json().get('id'), int), (
+            'Проверьте, при POST-запросе администратора к '
+            f'`{self.TITLES_URL}` в ответе возвращаются данные созданного '
+            'объекта. Сейчас поле `id` отсутствует или не является целым '
+            'числом.'
+        )
+    
+        response = client.get(self.TITLES_URL)
+        assert response.status_code == HTTPStatus.OK, (
+            'Проверьте, что GET-запрос неавторизованного пользователя к '
+            f'`{self.TITLES_URL}` возвращает ответ со статусом 200.'
+        )
+        data = response.json()
+        check_pagination(self.TITLES_URL, data, title_count)
+    
+        expected_title_names = {post_data_1['name'], post_data_2['name']}
+        title_names = {element.get('name') for element in data['results']}
+        assert len(expected_title_names.intersection(title_names)) == 2, (
+            f'Проверьте, что для эндпоинта `{self.TITLES_URL}` настроена '
+            'пагинация. Сейчас значение параметра `results` отсутствует или '
+            'содержит некорректную информацию о существующих объектах.'
+        )
+    
+        for element in data['results']:
+            if element['name'] == post_data_1['name']:
+                title = element
+    
+        assert title.get('rating') is None, (
+            'Проверьте, что при GET-запросе неавторизованного '
+            f'пользователя к `{self.TITLES_URL}` возвращается информация о '
+            'рейтинге произведений. Если отзывов о произведении нет - '
+            'значением поля `rating` должено быть `None`.'
+        )
+        assert title.get('category') == categories[0], (
+            'Проверьте, что при GET-запросе неавторизованного пользователя к '
+            f'`{self.TITLES_URL}` в ответе содержится информация о категориях '
+            'произведений. Сейчас поле `category` для элементов списка '
+            '`results` отсутствует или содержит некорректное значение.'
+        )
+    
+        title_genres = title.get('genre', [])
+        assert genres[0] in title_genres and genres[1] in title_genres, (
+            'Проверьте, что при GET-запросе неавторизованного пользователя к '
+            f'`{self.TITLES_URL}` в ответе содержится список жанров для '
+            'каждого произведения. Сейчас поле `genres` для элементов списка '
+            '`results` отсутствует или содержит некорректное значение.'
+        )
+        assert title.get('year') == post_data_1['year'], (
+            'Проверьте, что при GET-запросе неавторизованного пользователя к '
+            f'`{self.TITLES_URL}` в ответе содержится год выхода '
+            'произведений. Сейчас поле `year` для элементов списка `results` '
+            'отсутствует или содержит некорректное значение.'
+        )
+        assert title.get('description') == post_data_1['description'], (
+            'Проверьте, что при GET-запросе неавторизованного пользователя к '
+            f'`{self.TITLES_URL}` в ответе содержатся описания произведений. '
+            'Сейчас поле `description` для элементов списка `results` '
+            'отсутствует или содержит некорректное значение.'
+        )
+    
+        assert isinstance(title.get('id'), int), (
+            'Проверьте, что при GET-запросе неавторизованного пользователя к '
+            f'`{self.TITLES_URL}` в ответе содержатся `id` произведений. '
+            'Сейчас поле `id` для элементов списка `results` отсутствует или '
+            'его значение не является целым числом.'
+        )
+    
+        data = {
+            'name': 'Титаник',
+            'year': 1997,
+            'genre': [genres[1]['slug']],
+            'category': categories[1]['slug'],
+            'description': 'Дверь выдержала бы и двоих...'
+        }
+        admin_client.post(self.TITLES_URL, data=data)
+    
+        response = admin_client.get(
+            f'{self.TITLES_URL}?genre={genres[1]["slug"]}'
+        )
+        data = response.json()
+>       assert len(data['results']) == 2, (
+            f'Проверьте, что для эндпоинта `{self.TITLES_URL}` реализована '
+            'возможность фильтрации по полю `genre` с использованием '
+            'параметра `slug` жанра.'
+        )
+E       AssertionError: Проверьте, что для эндпоинта `/api/v1/titles/` реализована возможность фильтрации по полю `genre` с использованием параметра `slug` жанра.
+E       assert 3 == 2
+E         +3
+E         -2
+
+tests\test_04_title.py:161: AssertionError
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:224 Bad Request: /api/v1/titles/
+WARNING  django.request:log.py:224 Bad Request: /api/v1/titles/
+=========================== short test summary info ===========================
+FAILED tests/test_00_user_registration.py::Test00UserRegistration::test_get_new_confirmation_code_for_existing_user
+FAILED tests/test_00_user_registration.py::Test00UserRegistration::test_get_confirmation_code_for_user_created_by_admin
+FAILED tests/test_04_title.py::Test04TitleAPI::test_02_title_admin - Assertio...
+======================== 3 failed, 77 passed in 24.99s ========================
