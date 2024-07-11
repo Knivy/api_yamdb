@@ -1,6 +1,6 @@
 """Контроллеры."""
 
-from rest_framework import viewsets  # type: ignore
+from rest_framework import viewsets, mixins, filters  # type: ignore
 from django.contrib.auth import get_user_model  # type: ignore
 from django.shortcuts import get_object_or_404  # type: ignore
 
@@ -17,9 +17,12 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (AdminOnlyPermission,)
     lookup_field = 'username'
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username',)
 
 
-class SingleUserViewSet(viewsets.ModelViewSet):
+class SingleUserViewSet(mixins.RetrieveModelMixin,
+                        mixins.UpdateModelMixin, viewsets.GenericViewSet):
     """Обработка учётной записи."""
 
     serializer_class = SingleUserSerializer
@@ -31,3 +34,11 @@ class SingleUserViewSet(viewsets.ModelViewSet):
         return get_object_or_404(
             User,
             username=self.request.user.username)
+
+    def get_route_method_mapping(self):
+        # Переопределяем метод, чтобы указать, что методы
+        # должны использовать общий URL
+        return {
+            'retrieve': '',
+            'update': '',
+        }
