@@ -22,6 +22,6 @@ class AuthenticatedOnlyPermission(IsAuthenticated):
         """Проверка."""
         if not request.user.is_authenticated:
             return False
-        if request.method not in ('GET', 'PATCH'):
+        if request.method not in ('GET', 'PATCH', 'POST'):
             raise MethodNotAllowed(request.method)
         return True

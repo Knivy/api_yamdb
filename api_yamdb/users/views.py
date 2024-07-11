@@ -24,6 +24,7 @@ class SingleUserViewSet(viewsets.ModelViewSet):
 
     serializer_class = SingleUserSerializer
     permission_classes = (AuthenticatedOnlyPermission,)
+    pagination_class = None
 
     def get_queryset(self):
         """Получение учётной записи."""
