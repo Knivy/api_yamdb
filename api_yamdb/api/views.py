@@ -85,6 +85,7 @@ class TitleViewSet(OrderingMixin, viewsets.ModelViewSet):
     filterset_class = TitleFilter
 
     def get_serializer_class(self):
+        """Выбор сериализатора."""
         if self.action in ('list', 'retrieve',):
             return TitleReadSerializer
         return TitleWriteSerializer
@@ -104,6 +105,7 @@ class ReviewViewSet(OrderingDateMixin, TextPermissionsMixin,
                         pub_date=dt.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
 
     def perform_update(self, serializer):
+        """Обновление обзора."""
         serializer.save()
 
     def get_title(self):
