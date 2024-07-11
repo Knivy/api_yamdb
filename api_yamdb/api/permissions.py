@@ -12,15 +12,13 @@ class AdminOrReadListOnlyPermission(BasePermission):
             return True
         if not request.user.is_authenticated:
             return False
-        if request.method in ('POST',):
+        if request.method in ('POST', 'DELETE'):
             return request.user.is_admin
         return False
 
     def has_object_permission(self, request, view, obj):
         """Запрет просмотра одного объекта не-админу."""
-        if request.method in ('DELETE',):
-            return request.user.is_authenticated and request.user.is_admin
-        raise MethodNotAllowed(request.method)
+        return request.user.is_admin
 
 
 class AdminOrReadOnlyPermission(BasePermission):

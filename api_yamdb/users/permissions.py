@@ -8,7 +8,7 @@ class AdminOnlyPermission(BasePermission):
 
     def has_permission(self, request, view):
         """Проверка."""
-        if request.method not in ('PUT',):
+        if request.method in ('PUT',):
             return False
         if not request.user.is_authenticated:
             return False
