@@ -16,8 +16,8 @@ class AdminOrReadListOnlyPermission(BasePermission):
             return request.user.is_admin
         if view.action == 'retrieve':
             raise MethodNotAllowed(request.method)
-        if (request.method in ('PATCH',) and
-           (request.user.is_user or request.user.is_moderator)):
+        if (request.method in ('PATCH',)
+           and (request.user.is_user or request.user.is_moderator)):
             return False
         raise MethodNotAllowed(request.method)
 
@@ -49,6 +49,6 @@ class TextPermission(BasePermission):
         """Доступ к объектам."""
         if request.method in SAFE_METHODS:
             return True
-        return (request.user.is_authenticated and
-                (request.user.is_admin or request.user == obj.author
-                 or request.user.is_moderator))
+        return (request.user.is_authenticated
+                and (request.user.is_admin or request.user == obj.author
+                     or request.user.is_moderator))
