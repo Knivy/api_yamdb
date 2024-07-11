@@ -84,18 +84,24 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'author', 'score', 'pub_date')
         read_only_fields = ('id', 'author', 'pub_date')
 
-    def validate_author(self, value):
-        """Проверка автора."""
-        title_id = self.context['view'].kwargs.get('title_id')
+    def validate(self, data_to_validate):
+        """Проверка единственности отзыва."""
+        view = self.context.get('view')
+        if not view:
+            raise serializers.ValidationError('Нет view.')
+        title_id = view.kwargs.get('title_id')
         if not title_id:
             raise serializers.ValidationError('Не указано произведение.')
+        request = self.context.get('request')
+        if not request:
+            raise serializers.ValidationError('Нет данных запроса.')
         if Review.objects.filter(
-                author=value,
+                author=request.user,
                 title=title_id,
         ):
             raise serializers.ValidationError(
                 'Допустим только один обзор на произведение.')
-        return value
+        return data_to_validate
 
 
 class CommentSerializer(serializers.ModelSerializer):

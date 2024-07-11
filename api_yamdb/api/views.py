@@ -41,7 +41,20 @@ class TextPermissionsMixin(viewsets.ModelViewSet):
     permission_classes = (TextPermission,)
 
 
-class CategoryViewSet(PermissionsMixin, viewsets.ModelViewSet):
+class OrderingMixin(viewsets.ModelViewSet):
+    """Миксин сортировки."""
+
+    ordering = ('name',)
+
+
+class OrderingDateMixin(viewsets.ModelViewSet):
+    """Миксин сортировки."""
+
+    ordering = ('-pub_date',)
+
+
+class CategoryViewSet(OrderingMixin, PermissionsMixin,
+                      viewsets.ModelViewSet):
     """Обработка категорий."""
 
     queryset = Category.objects.all()
@@ -51,7 +64,8 @@ class CategoryViewSet(PermissionsMixin, viewsets.ModelViewSet):
     lookup_field = 'slug'  # Чтобы адрес был вида /categories/{slug}/
 
 
-class GenreViewSet(PermissionsMixin, viewsets.ModelViewSet):
+class GenreViewSet(OrderingMixin, PermissionsMixin,
+                   viewsets.ModelViewSet):
     """Обработка жанров."""
 
     queryset = Genre.objects.all()
@@ -61,7 +75,7 @@ class GenreViewSet(PermissionsMixin, viewsets.ModelViewSet):
     lookup_field = 'slug'
 
 
-class TitleViewSet(viewsets.ModelViewSet):
+class TitleViewSet(OrderingMixin, viewsets.ModelViewSet):
     """Обработка произведений."""
 
     queryset = Title.objects.all()
@@ -76,7 +90,8 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleWriteSerializer
 
 
-class ReviewViewSet(TextPermissionsMixin, viewsets.ModelViewSet):
+class ReviewViewSet(OrderingDateMixin, TextPermissionsMixin,
+                    viewsets.ModelViewSet):
     """Обработка обзоров."""
 
     serializer_class = ReviewSerializer
@@ -98,7 +113,8 @@ class ReviewViewSet(TextPermissionsMixin, viewsets.ModelViewSet):
         return self.get_title().reviews.all()
 
 
-class CommentViewSet(TextPermissionsMixin, viewsets.ModelViewSet):
+class CommentViewSet(OrderingDateMixin, TextPermissionsMixin,
+                     viewsets.ModelViewSet):
     """Обработка комментариев."""
 
     serializer_class = CommentSerializer
