@@ -29,14 +29,14 @@ class BaseNameSlugModel(BaseNameModel):
     slug = models.SlugField(unique=True, max_length=MAX_SLUG_LENGTH,
                             verbose_name='Слаг')
 
-    class Meta:
+    class Meta(BaseNameModel.Meta):
         abstract = True
 
 
 class Category(BaseNameSlugModel):
     """Категории."""
 
-    class Meta:
+    class Meta(BaseNameSlugModel.Meta):
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
@@ -44,7 +44,7 @@ class Category(BaseNameSlugModel):
 class Genre(BaseNameSlugModel):
     """Жанры."""
 
-    class Meta:
+    class Meta(BaseNameSlugModel.Meta):
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
 
@@ -62,7 +62,7 @@ class Title(BaseNameModel):
         Category, on_delete=models.DO_NOTHING, related_name='titles',
         verbose_name='Категория', blank=True, null=True)
 
-    class Meta:
+    class Meta(BaseNameModel.Meta):
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
 
@@ -76,7 +76,7 @@ class BaseTextModel(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ('pub_date',)
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.text
@@ -96,9 +96,15 @@ class Review(BaseTextModel):
         Title, on_delete=models.CASCADE, related_name='reviews',
         verbose_name='Произведение')
 
-    class Meta:
+    class Meta(BaseTextModel.Meta):
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
+        constraints = [
+            # К одному произведению можно только один обзор.
+            models.UniqueConstraint(
+                fields=('title', 'author'),
+                name='unique_title_author'),
+        ]
 
 
 class Comment(BaseTextModel):
@@ -111,6 +117,6 @@ class Comment(BaseTextModel):
         User, on_delete=models.CASCADE, related_name='comments',
         verbose_name='Автор')
 
-    class Meta:
+    class Meta(BaseTextModel.Meta):
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'

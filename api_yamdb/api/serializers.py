@@ -47,6 +47,9 @@ class TitleWriteSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         """Представление объекта."""
+        view = self.context.get('view')
+        if not view:
+            raise serializers.ValidationError('Нет view.')
         return TitleReadSerializer().to_representation(instance)
 
 
@@ -67,8 +70,8 @@ class TitleReadSerializer(serializers.ModelSerializer):
     def get_rating(self, obj):
         """Расчёт рейтинга."""
         scores = obj.reviews.values_list('score', flat=True)
-        return int(np.mean((score for score
-                           in scores))) if scores else None
+        return int(np.mean([score for score
+                           in scores])) if scores else None
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -89,6 +92,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         view = self.context.get('view')
         if not view:
             raise serializers.ValidationError('Нет view.')
+        if not view.action == 'create':
+            return data_to_validate
         title_id = view.kwargs.get('title_id')
         if not title_id:
             raise serializers.ValidationError('Не указано произведение.')

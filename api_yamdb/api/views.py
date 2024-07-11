@@ -84,7 +84,7 @@ class TitleViewSet(OrderingMixin, viewsets.ModelViewSet):
                         'genre__slug', 'category__slug')
 
     def get_serializer_class(self):
-        if self.action in ('list', 'retrieve'):
+        if self.action in ('list', 'retrieve',):
             return TitleReadSerializer
         return TitleWriteSerializer
 
@@ -97,10 +97,13 @@ class ReviewViewSet(OrderingDateMixin, TextPermissionsMixin,
     queryset = Review.objects.all()
 
     def perform_create(self, serializer):
-        """Создание поста."""
+        """Создание обзора."""
         serializer.save(author=self.request.user,
                         title=self.get_title(),
                         pub_date=dt.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
+        
+    def perform_update(self, serializer):
+        serializer.save()
 
     def get_title(self):
         """Получение произведения."""

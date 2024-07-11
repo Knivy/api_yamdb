@@ -57,14 +57,14 @@ tests/test_02_category.py::Test02CategoryAPI::test_02_category_with_admin_user P
 tests/test_02_category.py::Test02CategoryAPI::test_03_category_fields_validation[data0-massage0] PASSED [ 62%]
 tests/test_02_category.py::Test02CategoryAPI::test_03_category_fields_validation[data1-massage1] PASSED [ 63%]
 tests/test_02_category.py::Test02CategoryAPI::test_03_category_fields_validation[data2-massage2] PASSED [ 65%]
-tests/test_02_category.py::Test02CategoryAPI::test_04_category_delete_admin FAILED [ 66%]
+tests/test_02_category.py::Test02CategoryAPI::test_04_category_delete_admin PASSED [ 66%]
 tests/test_02_category.py::Test02CategoryAPI::test_05_category_check_permission_admin PASSED [ 67%]
 tests/test_03_genre.py::Test03GenreAPI::test_01_genre_not_auth PASSED    [ 68%]
 tests/test_03_genre.py::Test03GenreAPI::test_02_genre PASSED             [ 70%]
 tests/test_03_genre.py::Test03GenreAPI::test_03_category_fields_validation[data0-massage0] PASSED [ 71%]
 tests/test_03_genre.py::Test03GenreAPI::test_03_category_fields_validation[data1-massage1] PASSED [ 72%]
 tests/test_03_genre.py::Test03GenreAPI::test_03_category_fields_validation[data2-massage2] PASSED [ 73%]
-tests/test_03_genre.py::Test03GenreAPI::test_04_genres_delete FAILED     [ 75%]
+tests/test_03_genre.py::Test03GenreAPI::test_04_genres_delete PASSED     [ 75%]
 tests/test_03_genre.py::Test03GenreAPI::test_05_genres_check_permission PASSED [ 76%]
 tests/test_04_title.py::Test04TitleAPI::test_01_title_not_auth PASSED    [ 77%]
 tests/test_04_title.py::Test04TitleAPI::test_02_title_admin FAILED       [ 78%]
@@ -73,7 +73,7 @@ tests/test_04_title.py::Test04TitleAPI::test_04_titles_name_length_validation PA
 tests/test_04_title.py::Test04TitleAPI::test_05_titles_check_permission PASSED [ 82%]
 tests/test_04_title.py::Test04TitleAPI::test_06_titles_detail_put_not_allowed PASSED [ 83%]
 tests/test_05_review.py::Test05ReviewAPI::test_01_review_not_auth PASSED [ 85%]
-tests/test_05_review.py::Test05ReviewAPI::test_02_review_post FAILED     [ 86%]
+tests/test_05_review.py::Test05ReviewAPI::test_02_review_post PASSED     [ 86%]
 tests/test_05_review.py::Test05ReviewAPI::test_03_review_detail_get PASSED [ 87%]
 tests/test_05_review.py::Test05ReviewAPI::test_04_review_detail_user FAILED [ 88%]
 tests/test_05_review.py::Test05ReviewAPI::test_05_reviews_detail_moderator_and_admin FAILED [ 90%]
@@ -89,8 +89,8 @@ tests/test_06_comment.py::Test06CommentAPI::test_07_comment_detail_put_not_allow
 ================================== FAILURES ===================================
 ___ Test00UserRegistration.test_get_new_confirmation_code_for_existing_user ___
 
-self = <tests.test_00_user_registration.Test00UserRegistration object at 0x00000261D438BDC0>
-client = <django.test.client.Client object at 0x00000261D53C8160>
+self = <tests.test_00_user_registration.Test00UserRegistration object at 0x000002294D13E6A0>
+client = <django.test.client.Client object at 0x000002294D17ADF0>
 
     def test_get_new_confirmation_code_for_existing_user(self, client):
         valid_data = {
@@ -120,9 +120,9 @@ tests\test_00_user_registration.py:351: AssertionError
 WARNING  django.request:log.py:224 Bad Request: /api/v1/auth/signup/
 _ Test00UserRegistration.test_get_confirmation_code_for_user_created_by_admin _
 
-self = <tests.test_00_user_registration.Test00UserRegistration object at 0x00000261D5420C40>
-admin_client = <rest_framework.test.APIClient object at 0x00000261D5414790>
-client = <django.test.client.Client object at 0x00000261D5414520>
+self = <tests.test_00_user_registration.Test00UserRegistration object at 0x000002294D0F0970>
+admin_client = <rest_framework.test.APIClient object at 0x000002294D202760>
+client = <django.test.client.Client object at 0x000002294D202910>
 django_user_model = <class 'users.models.YamdbUser'>
 
     def test_get_confirmation_code_for_user_created_by_admin(
@@ -154,110 +154,11 @@ E         -<HTTPStatus.OK: 200>
 tests\test_00_user_registration.py:373: AssertionError
 ------------------------------ Captured log call ------------------------------
 WARNING  django.request:log.py:224 Bad Request: /api/v1/auth/signup/
-_______________ Test02CategoryAPI.test_04_category_delete_admin _______________
-
-self = <tests.test_02_category.Test02CategoryAPI object at 0x00000261D54D46A0>
-admin_client = <rest_framework.test.APIClient object at 0x00000261D56030A0>
-
-    def test_04_category_delete_admin(self, admin_client):
-        category_1, category_2 = create_categories(admin_client)
-        response = admin_client.delete(
-            self.CATEGORY_SLUG_TEMPLATE_URL.format(
-                slug=category_1['slug']
-            )
-        )
-        assert response.status_code == HTTPStatus.NO_CONTENT, (
-            'Проверьте, что DELETE-запрос администратора к '
-            f'`{self.CATEGORY_SLUG_TEMPLATE_URL}` возвращает ответ со '
-            'статусом 204.'
-        )
-        response = admin_client.get(self.CATEGORY_URL)
-        test_data = response.json()['results']
-        assert len(test_data) == 1, (
-            'Проверьте, что DELETE-запрос администратора к '
-            f'`{self.CATEGORY_SLUG_TEMPLATE_URL}` удаляет категорию.'
-        )
-    
-        response = admin_client.get(
-            self.CATEGORY_SLUG_TEMPLATE_URL.format(
-                slug=category_2['slug']
-            )
-        )
-        assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED, (
-            'Проверьте, что GET-запросы к '
-            f'`{self.CATEGORY_SLUG_TEMPLATE_URL}` запрещены и возвращают '
-            'ответ со статусом 405.'
-        )
-        response = admin_client.patch(
-            self.CATEGORY_SLUG_TEMPLATE_URL.format(
-                slug=category_2['slug']
-            )
-        )
->       assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED, (
-            'Проверьте, что PATCH-запросы к '
-            f'`{self.CATEGORY_SLUG_TEMPLATE_URL}` запрещены и возвращают '
-            'ответ со статусом 405.'
-        )
-E       AssertionError: Проверьте, что PATCH-запросы к `/api/v1/categories/{slug}/` запрещены и возвращают ответ со статусом 405.
-E       assert 403 == <HTTPStatus.METHOD_NOT_ALLOWED: 405>
-E         +403
-E         -<HTTPStatus.METHOD_NOT_ALLOWED: 405>
-
-tests\test_02_category.py:133: AssertionError
------------------------------- Captured log call ------------------------------
-WARNING  django.request:log.py:224 Method Not Allowed: /api/v1/categories/books/
-WARNING  django.request:log.py:224 Forbidden: /api/v1/categories/books/
-____________________ Test03GenreAPI.test_04_genres_delete _____________________
-
-self = <tests.test_03_genre.Test03GenreAPI object at 0x00000261D54AB4F0>
-admin_client = <rest_framework.test.APIClient object at 0x00000261D557CCD0>
-
-    def test_04_genres_delete(self, admin_client):
-        genres = create_genre(admin_client)
-        response = admin_client.delete(
-            self.GENRES_SLUG_TEMPLATE_URL.format(slug=genres[0]['slug'])
-        )
-        assert response.status_code == HTTPStatus.NO_CONTENT, (
-            'Проверьте, что DELETE-запрос администратора к '
-            f'`{self.GENRES_SLUG_TEMPLATE_URL}` возвращает ответ со  статусом '
-            '204.'
-        )
-        response = admin_client.get(self.GENRES_URL)
-        test_data = response.json()['results']
-        assert len(test_data) == len(genres) - 1, (
-            'Проверьте, что DELETE-запрос администратора к '
-            f'`{self.GENRES_SLUG_TEMPLATE_URL}` удаляет жанр из БД.'
-        )
-        response = admin_client.get(
-            self.GENRES_SLUG_TEMPLATE_URL.format(slug=genres[0]['slug'])
-        )
-        assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED, (
-            'Проверьте, что GET-запрос администратора к '
-            f'`{self.GENRES_SLUG_TEMPLATE_URL}` возвращает ответ со статусом '
-            '405.'
-        )
-        response = admin_client.patch(
-            self.GENRES_SLUG_TEMPLATE_URL.format(slug=genres[0]['slug'])
-        )
->       assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED, (
-            'Проверьте, что PATCH-запрос администратора к '
-            f'`{self.GENRES_SLUG_TEMPLATE_URL}` возвращает ответ со статусом '
-            '405.'
-        )
-E       AssertionError: Проверьте, что PATCH-запрос администратора к `/api/v1/genres/{slug}/` возвращает ответ со статусом 405.
-E       assert 403 == <HTTPStatus.METHOD_NOT_ALLOWED: 405>
-E         +403
-E         -<HTTPStatus.METHOD_NOT_ALLOWED: 405>
-
-tests\test_03_genre.py:116: AssertionError
------------------------------- Captured log call ------------------------------
-WARNING  django.request:log.py:224 Method Not Allowed: /api/v1/genres/horror/
-WARNING  django.request:log.py:224 Forbidden: /api/v1/genres/horror/
 _____________________ Test04TitleAPI.test_02_title_admin ______________________
 
-self = <tests.test_04_title.Test04TitleAPI object at 0x00000261D53D7340>
-admin_client = <rest_framework.test.APIClient object at 0x00000261D5387880>
-client = <django.test.client.Client object at 0x00000261D5387160>
+self = <tests.test_04_title.Test04TitleAPI object at 0x000002294D349850>
+admin_client = <rest_framework.test.APIClient object at 0x000002294D0BC700>
+client = <django.test.client.Client object at 0x000002294D17ADC0>
 
     def test_02_title_admin(self, admin_client, client):
         genres = create_genre(admin_client)
@@ -406,95 +307,14 @@ tests\test_04_title.py:161: AssertionError
 ------------------------------ Captured log call ------------------------------
 WARNING  django.request:log.py:224 Bad Request: /api/v1/titles/
 WARNING  django.request:log.py:224 Bad Request: /api/v1/titles/
-_____________________ Test05ReviewAPI.test_02_review_post _____________________
-
-self = <tests.test_05_review.Test05ReviewAPI object at 0x00000261A5F64310>
-admin_client = <rest_framework.test.APIClient object at 0x00000261A5E92EB0>
-user_client = <rest_framework.test.APIClient object at 0x00000261A5F08940>
-moderator_client = <rest_framework.test.APIClient object at 0x00000261D5403C40>
-admin = <YamdbUser: TestAdmin>
-
-    def test_02_review_post(self, admin_client, user_client,
-                            moderator_client, admin):
-        titles, _, _ = create_titles(admin_client)
-        title_0_reviews_count = 0
-        first_title_reviews_url = self.REVIEWS_URL_TEMPLATE.format(
-            title_id=titles[0]['id']
-        )
-        second_title_reviews_url = self.REVIEWS_URL_TEMPLATE.format(
-            title_id=titles[1]['id']
-        )
-    
-        data = {}
-        response = user_client.post(first_title_reviews_url, data=data)
-        assert response.status_code == HTTPStatus.BAD_REQUEST, (
-            'Если POST-запрос авторизованного пользователя к '
-            f'`{self.REVIEWS_URL_TEMPLATE}` содержит некорректные данные - '
-            'должен вернуться ответ со статусом 400.'
-        )
-    
-        post_data = {
-            'text': 'Неочень',
-            'score': 5
-        }
-        create_single_review(
-            admin_client,
-            titles[0]['id'],
-            post_data['text'],
-            post_data['score']
-        )
-        title_0_reviews_count += 1
-    
-        data = {
-            'text': 'Шляпа',
-            'score': 1
-        }
-        response = admin_client.post(first_title_reviews_url, data=data)
-        assert response.status_code == HTTPStatus.BAD_REQUEST, (
-            'Проверьте, что при попытке пользователя создать второй отзыв на '
-            'одно и то же произведение POST-запрос к '
-            f'`{self.REVIEWS_URL_TEMPLATE}` вернёт ответ со статусом 400.'
-        )
-    
-        try:
-            from reviews.models import Review, Title
-        except Exception as e:
-            assert False, (
-                'Не удалось импортировать модели из приложения reviews. '
-                f'Ошибка: {e}'
-            )
-        title = Title.objects.get(pk=titles[0]['id'])
-        review = None
-        try:
-            review = Review.objects.create(
-                text='Текст второго отзыва',
-                score='5',
-                author=admin,
-                title=title
-            )
-        except IntegrityError:
-            pass
-    
->       assert review is None, (
-            'Проверьте, что на уровне модели запрещено повторное '
-            'создание отзыва на произведение от имени пользователя, отзыв '
-            'которого уже существует.'
-        )
-E       AssertionError: Проверьте, что на уровне модели запрещено повторное создание отзыва на произведение от имени пользователя, отзыв которого уже существует.
-E       assert <Review: Текст второго отзыва> is None
-
-tests\test_05_review.py:136: AssertionError
------------------------------- Captured log call ------------------------------
-WARNING  django.request:log.py:224 Bad Request: /api/v1/titles/13/reviews/
-WARNING  django.request:log.py:224 Bad Request: /api/v1/titles/13/reviews/
 _________________ Test05ReviewAPI.test_04_review_detail_user __________________
 
-self = <tests.test_05_review.Test05ReviewAPI object at 0x00000261A5E03FD0>
-admin_client = <rest_framework.test.APIClient object at 0x00000261D4394E50>
+self = <tests.test_05_review.Test05ReviewAPI object at 0x000002294D16A220>
+admin_client = <rest_framework.test.APIClient object at 0x000002291DAAB880>
 admin = <YamdbUser: TestAdmin>, user = <YamdbUser: TestUser>
-user_client = <rest_framework.test.APIClient object at 0x00000261D43944F0>
+user_client = <rest_framework.test.APIClient object at 0x000002291DAB7DF0>
 moderator = <YamdbUser: TestModerator>
-moderator_client = <rest_framework.test.APIClient object at 0x00000261A5D470A0>
+moderator_client = <rest_framework.test.APIClient object at 0x000002291DAB74F0>
 
     def test_04_review_detail_user(self, admin_client, admin, user,
                                    user_client, moderator, moderator_client):
@@ -525,15 +345,15 @@ E         -<HTTPStatus.OK: 200>
 
 tests\test_05_review.py:276: AssertionError
 ------------------------------ Captured log call ------------------------------
-WARNING  django.request:log.py:224 Bad Request: /api/v1/titles/17/reviews/10/
+WARNING  django.request:log.py:224 Bad Request: /api/v1/titles/17/reviews/11/
 _________ Test05ReviewAPI.test_05_reviews_detail_moderator_and_admin __________
 
-self = <tests.test_05_review.Test05ReviewAPI object at 0x00000261D4394C10>
-admin_client = <rest_framework.test.APIClient object at 0x00000261D54260A0>
+self = <tests.test_05_review.Test05ReviewAPI object at 0x000002294D2C15E0>
+admin_client = <rest_framework.test.APIClient object at 0x000002291DA99E20>
 admin = <YamdbUser: TestAdmin>
-user_client = <rest_framework.test.APIClient object at 0x00000261D54039A0>
+user_client = <rest_framework.test.APIClient object at 0x000002294D2E3C40>
 user = <YamdbUser: TestUser>
-moderator_client = <rest_framework.test.APIClient object at 0x00000261D5403040>
+moderator_client = <rest_framework.test.APIClient object at 0x000002294D2E3130>
 moderator = <YamdbUser: TestModerator>
 
     def test_05_reviews_detail_moderator_and_admin(self, admin_client, admin,
@@ -573,43 +393,11 @@ E             -<HTTPStatus.OK: 200>
 
 tests\test_05_review.py:370: AssertionError
 ------------------------------ Captured log call ------------------------------
-WARNING  django.request:log.py:224 Bad Request: /api/v1/titles/19/reviews/13/
-============================== warnings summary ===============================
-tests/test_02_category.py::Test02CategoryAPI::test_01_category_not_auth
-tests/test_02_category.py::Test02CategoryAPI::test_02_category_with_admin_user
-tests/test_02_category.py::Test02CategoryAPI::test_04_category_delete_admin
-  f:\Python\_Dev\api_yamdb\.venv\lib\site-packages\rest_framework\pagination.py:200: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'reviews.models.Category'> QuerySet.
-    paginator = self.django_paginator_class(queryset, page_size)
-
-tests/test_03_genre.py::Test03GenreAPI::test_01_genre_not_auth
-tests/test_03_genre.py::Test03GenreAPI::test_02_genre
-tests/test_03_genre.py::Test03GenreAPI::test_04_genres_delete
-  f:\Python\_Dev\api_yamdb\.venv\lib\site-packages\rest_framework\pagination.py:200: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'reviews.models.Genre'> QuerySet.
-    paginator = self.django_paginator_class(queryset, page_size)
-
-tests/test_04_title.py::Test04TitleAPI::test_01_title_not_auth
-tests/test_04_title.py::Test04TitleAPI::test_02_title_admin
-tests/test_04_title.py::Test04TitleAPI::test_03_titles_detail
-  f:\Python\_Dev\api_yamdb\.venv\lib\site-packages\rest_framework\pagination.py:200: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'reviews.models.Title'> QuerySet.
-    paginator = self.django_paginator_class(queryset, page_size)
-
-tests/test_05_review.py::Test05ReviewAPI::test_01_review_not_auth
-  f:\Python\_Dev\api_yamdb\.venv\lib\site-packages\rest_framework\pagination.py:200: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'reviews.models.Review'> QuerySet.
-    paginator = self.django_paginator_class(queryset, page_size)
-
-tests/test_06_comment.py::Test06CommentAPI::test_01_comment_not_auth
-tests/test_06_comment.py::Test06CommentAPI::test_02_comment
-  f:\Python\_Dev\api_yamdb\.venv\lib\site-packages\rest_framework\pagination.py:200: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'reviews.models.Comment'> QuerySet.
-    paginator = self.django_paginator_class(queryset, page_size)
-
--- Docs: https://docs.pytest.org/en/stable/warnings.html
+WARNING  django.request:log.py:224 Bad Request: /api/v1/titles/19/reviews/14/
 =========================== short test summary info ===========================
 FAILED tests/test_00_user_registration.py::Test00UserRegistration::test_get_new_confirmation_code_for_existing_user
 FAILED tests/test_00_user_registration.py::Test00UserRegistration::test_get_confirmation_code_for_user_created_by_admin
-FAILED tests/test_02_category.py::Test02CategoryAPI::test_04_category_delete_admin
-FAILED tests/test_03_genre.py::Test03GenreAPI::test_04_genres_delete - Assert...
 FAILED tests/test_04_title.py::Test04TitleAPI::test_02_title_admin - Assertio...
-FAILED tests/test_05_review.py::Test05ReviewAPI::test_02_review_post - Assert...
 FAILED tests/test_05_review.py::Test05ReviewAPI::test_04_review_detail_user
 FAILED tests/test_05_review.py::Test05ReviewAPI::test_05_reviews_detail_moderator_and_admin
-================= 8 failed, 72 passed, 12 warnings in 26.15s ==================
+======================== 5 failed, 75 passed in 25.15s ========================
