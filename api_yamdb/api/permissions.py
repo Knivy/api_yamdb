@@ -14,8 +14,6 @@ class AdminOrReadListOnlyPermission(BasePermission):
             return False
         if request.method in {'POST', 'DELETE'}:
             return request.user.is_admin
-        if view.action == 'retrieve':
-            raise MethodNotAllowed(request.method)
         if (request.method == 'PATCH'
            and (request.user.is_user or request.user.is_moderator)):
             return False
@@ -41,7 +39,7 @@ class TextPermission(BasePermission):
         """Проверка метода."""
         if request.method in SAFE_METHODS:
             return True
-        if request.method in ('PUT',):
+        if request.method == 'PUT':
             raise MethodNotAllowed(request.method)
         return request.user.is_authenticated
 
@@ -49,7 +47,7 @@ class TextPermission(BasePermission):
         """Доступ к объектам."""
         if request.method in SAFE_METHODS:
             return True
-        return (request.user.is_authenticated
+        return (request.user.is_authenticated 
                 and (request.user.is_admin
                      or request.user == text_object.author
                      or request.user.is_moderator))

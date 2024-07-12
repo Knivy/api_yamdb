@@ -3,7 +3,6 @@
 from rest_framework import serializers  # type: ignore
 from rest_framework.relations import SlugRelatedField  # type: ignore
 from django.contrib.auth import get_user_model  # type: ignore
-import numpy as np
 
 from reviews.models import Category, Genre, Title, Review, Comment
 
@@ -60,18 +59,12 @@ class TitleReadSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(
         many=True,
     )
-    rating = serializers.SerializerMethodField()
+    rating = serializers.IntegerField(allow_null=True)
 
     class Meta:
         model = Title
         fields = ('id', 'name', 'year', 'rating', 'description',
                   'genre', 'category')
-
-    def get_rating(self, obj):
-        """Расчёт рейтинга."""
-        scores = obj.reviews.values_list('score', flat=True)
-        return int(np.mean([score for score
-                           in scores])) if scores else None
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -92,7 +85,6 @@ class ReviewSerializer(AuthorSerializer):
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
-        read_only_fields = ('id', 'author', 'pub_date')
 
     def validate(self, data_to_validate):
         """Проверка единственности отзыва."""

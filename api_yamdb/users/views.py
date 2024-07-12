@@ -31,12 +31,12 @@ class UserViewSet(ModelViewSet):
         user = request.user
         if request.method == 'GET':
             serializer = self.get_serializer(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data)
 
         serializer = self.get_serializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data)
 
     def get_serializer_class(self):
         if self.action == 'me':

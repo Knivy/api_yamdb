@@ -10,18 +10,14 @@ from .constants import NAME_MAX_LENGTH, EMAIL_MAX_LENGTH
 User = get_user_model()
 
 
-class ValidationErrorSerializer(serializers.Serializer):
-    """Сериализатор ошибок валидации."""
+class UsernameEmailValidationSerializer(serializers.Serializer):
+    """Сериализатор валидации логина и емайла."""
 
     class Meta:
         abstract = True
 
     def validate_username(self, value):
         """Проверка логина."""
-        if not value:
-            raise serializers.ValidationError(
-                'Логин не может быть пустым.'
-            )
         if value.lower() == 'me':
             raise serializers.ValidationError(
                 'Нельзя назвать логин "me".'
@@ -36,13 +32,9 @@ class ValidationErrorSerializer(serializers.Serializer):
                 'Логин содержит недопустимые символы.'
             )
         return value
-
+    
     def validate_email(self, value):
         """Проверка email."""
-        if not value:
-            raise serializers.ValidationError(
-                'Email не может быть пустым.'
-            )
         if len(value) > EMAIL_MAX_LENGTH:
             raise serializers.ValidationError(
                 'Email слишком длинный.'
@@ -50,32 +42,7 @@ class ValidationErrorSerializer(serializers.Serializer):
         return value
 
 
-class FullValidationErrorSerializer(ValidationErrorSerializer):
-    """Сериализатор ошибок валидации."""
-
-    class Meta:
-        abstract = True
-
-    def validate_first_name(self, value):
-        """Проверка имени."""
-        if len(value) > NAME_MAX_LENGTH:
-            raise serializers.ValidationError(
-                f'Длина имени не должна превышать {NAME_MAX_LENGTH} '
-                f'символов.'
-            )
-        return value
-
-    def validate_last_name(self, value):
-        """Проверка фамилии."""
-        if len(value) > NAME_MAX_LENGTH:
-            raise serializers.ValidationError(
-                f'Длина фамилии не должна превышать {NAME_MAX_LENGTH} '
-                f'символов.'
-            )
-        return value
-
-
-class UserSerializer(FullValidationErrorSerializer,
+class UserSerializer(UsernameEmailValidationSerializer,
                      serializers.ModelSerializer):
     """Сериализатор пользователей."""
 
@@ -93,28 +60,11 @@ class SingleUserSerializer(UserSerializer):
         read_only_fields = ('role',)
 
 
-# class UserCreationSerializer(ValidationErrorSerializer,
-#                              serializers.Serializer):
-#     email = serializers.EmailField(
-#         required=True,
-#         validators=[UniqueValidator(queryset=User.objects.all())]
-#     )
-#     username = serializers.CharField(
-#         required=True,
-#         validators=[UniqueValidator(queryset=User.objects.all())]
-#     )
-
-
-class UserGetOrCreationSerializer(ValidationErrorSerializer,
-                                  serializers.Serializer):
-    email = serializers.EmailField(
-        required=True,
-    )
-    username = serializers.CharField(
-        required=True,
-    )
+class UserGetOrCreationSerializer(UsernameEmailValidationSerializer):
+    email = serializers.EmailField()
+    username = serializers.CharField()
 
 
 class ConfirmationCodeSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True)
-    confirmation_code = serializers.CharField(required=True)
+    username = serializers.CharField()
+    confirmation_code = serializers.CharField()

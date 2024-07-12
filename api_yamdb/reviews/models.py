@@ -2,6 +2,7 @@
 
 from django.db import models  # type: ignore
 from django.contrib.auth import get_user_model  # type: ignore
+
 from .constants import (MAX_NAME_LENGTH, MAX_SLUG_LENGTH,
                         MIN_SCORE, MAX_SCORE)
 
@@ -53,7 +54,7 @@ class Title(BaseNameModel):
     """Произведения искусства."""
 
     year = models.PositiveSmallIntegerField(verbose_name='Год')
-    description = models.TextField(blank=True, null=True,
+    description = models.TextField(blank=True,
                                    verbose_name='Описание')
     genre = models.ManyToManyField(
         Genre, related_name='titles',
@@ -86,8 +87,8 @@ class Review(BaseTextModel):
     """Отзывы."""
 
     score = models.PositiveSmallIntegerField(
-        choices=tuple((i, str(i)) for i in range(MIN_SCORE,
-                                                 MAX_SCORE + 1)),
+        choices=tuple((user_score, str(user_score))
+                      for user_score in range(MIN_SCORE, MAX_SCORE + 1)),
         verbose_name='Оценка')
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='reviews',

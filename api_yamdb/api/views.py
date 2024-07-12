@@ -14,6 +14,7 @@ from rest_framework_simplejwt.tokens import AccessToken  # type: ignore
 from django.conf import settings  # type: ignore
 from django.http import JsonResponse  # type: ignore
 from rest_framework.exceptions import ParseError  # type: ignore
+from rest_framework.exceptions import MethodNotAllowed  # type: ignore
 
 from reviews.models import Category, Genre, Title, Review, Comment
 from .serializers import (CategorySerializer, GenreSerializer,
@@ -24,6 +25,7 @@ from users.serializers import (UserGetOrCreationSerializer,
 from .permissions import (AdminOrReadListOnlyPermission,
                           AdminOrReadOnlyPermission, TextPermission)
 from .filters import TitleFilter
+from django.db import models
 
 User = get_user_model()
 
@@ -77,7 +79,6 @@ class GenreViewSet(OrderingMixin, PermissionsMixin,
 class TitleViewSet(OrderingMixin, viewsets.ModelViewSet):
     """Обработка произведений."""
 
-    queryset = Title.objects.all()
     permission_classes = (AdminOrReadOnlyPermission,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
@@ -87,6 +88,14 @@ class TitleViewSet(OrderingMixin, viewsets.ModelViewSet):
         if self.action in {'list', 'retrieve'}:
             return TitleReadSerializer
         return TitleWriteSerializer
+    
+    def get_queryset(self):
+        """Набор произведений."""
+        if self.action in {'list', 'retrieve'}:
+            return Title.objects.annotate(
+                rating=models.Avg('reviews__score')
+            )
+        return Title.objects.all()
 
 
 class ReviewViewSet(OrderingDateMixin, TextPermissionsMixin,
@@ -135,8 +144,8 @@ class CommentViewSet(OrderingDateMixin, TextPermissionsMixin,
         return self.get_review().comments.all()
 
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
+@api_view(('POST',))
+@permission_classes((AllowAny,))
 def send_confirmation_code(request):
     serializer = UserGetOrCreationSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -170,7 +179,7 @@ def send_confirmation_code(request):
         fail_silently=False
     )
 
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.data)
 
 
 @api_view(['POST'])
@@ -196,5 +205,5 @@ def get_jwt_token(request):
 
 def page_not_found(request, exception) -> JsonResponse:
     """Ошибка 404: Объект не найден."""
-    return JsonResponse({"message": "Объект не найден."},
+    return JsonResponse({'message': 'Объект не найден.'},
                         status=status.HTTP_404_NOT_FOUND)
