@@ -4,6 +4,8 @@ import re
 
 from rest_framework import serializers  # type: ignore
 from django.contrib.auth import get_user_model  # type: ignore
+from django.shortcuts import get_object_or_404  # type: ignore
+from django.contrib.auth.tokens import default_token_generator  # type: ignore
 
 from .constants import NAME_MAX_LENGTH, EMAIL_MAX_LENGTH
 
@@ -87,3 +89,12 @@ class UserGetOrCreationSerializer(UsernameEmailValidationSerializer):
 class ConfirmationCodeSerializer(serializers.Serializer):
     username = serializers.CharField()
     confirmation_code = serializers.CharField()
+
+    def validate(self, data_to_validate):
+        """Проверка кода подтверждения."""
+        username = data_to_validate.get('username')
+        confirmation_code = data_to_validate.get('confirmation_code')
+        user = get_object_or_404(User, username=username)
+        if not default_token_generator.check_token(user, confirmation_code):
+            raise serializers.ValidationError('Неверный код подтверждения.')
+        return data_to_validate

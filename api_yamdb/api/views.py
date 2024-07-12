@@ -13,7 +13,6 @@ from rest_framework.response import Response  # type: ignore
 from rest_framework_simplejwt.tokens import AccessToken  # type: ignore
 from django.conf import settings  # type: ignore
 from django.http import JsonResponse  # type: ignore
-from rest_framework.exceptions import ParseError  # type: ignore
 from django.db import models  # type: ignore
 
 from reviews.models import Category, Genre, Title, Review, Comment
@@ -148,8 +147,8 @@ def send_confirmation_code(request):
     serializer = UserGetOrCreationSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
-    email = serializer.data['email']
-    username = serializer.data['username']
+    email = serializer.validated_data.get('email')
+    username = serializer.validated_data.get('username')
 
     user, created = User.objects.get_or_create(email=email,
                                                username=username)
@@ -164,7 +163,7 @@ def send_confirmation_code(request):
         fail_silently=False
     )
 
-    return Response(serializer.data)
+    return Response(serializer.validated_data)
 
 
 @api_view(['POST'])
@@ -173,19 +172,12 @@ def get_jwt_token(request):
     serializer = ConfirmationCodeSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
-    username = serializer.data.get('username')
-    confirmation_code = serializer.data.get('confirmation_code')
-
+    username = serializer.validated_data.get('username')
     user = get_object_or_404(User, username=username)
-
-    if default_token_generator.check_token(user, confirmation_code):
-        token = AccessToken.for_user(user)
-        return Response(
-            {'token': str(token)}, status=status.HTTP_200_OK
+    token = AccessToken.for_user(user)
+    return Response(
+            {'token': str(token)}
         )
-
-    return Response({'confirmation_code': 'Неверный код подтверждения'},
-                    status=status.HTTP_400_BAD_REQUEST)
 
 
 def page_not_found(request, exception) -> JsonResponse:
