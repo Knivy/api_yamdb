@@ -64,6 +64,25 @@ class UserGetOrCreationSerializer(UsernameEmailValidationSerializer):
     email = serializers.EmailField()
     username = serializers.CharField()
 
+    def validate(self, data_to_validate):
+        """Проверка существования пользователя."""
+        email = data_to_validate.get('email') 
+        username = data_to_validate.get('username')
+        users = User.objects.filter(email=email)
+        user = None
+        if users:
+            user = users[0]
+            if user.username != username:
+                raise serializers.ValidationError('Емайл уже существует.')
+        else:
+            users = User.objects.filter(username=username)
+            if users:
+                user = users[0]
+                if user.email != email:
+                    raise serializers.ValidationError(
+                        'Имя пользователя уже существует.')
+        return data_to_validate
+
 
 class ConfirmationCodeSerializer(serializers.Serializer):
     username = serializers.CharField()

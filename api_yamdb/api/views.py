@@ -151,21 +151,8 @@ def send_confirmation_code(request):
     email = serializer.data['email']
     username = serializer.data['username']
 
-    users = User.objects.filter(email=email)
-    user = None
-    if users:
-        user = users[0]
-        if user.username != username:
-            raise ParseError('Емайл уже существует.')
-    else:
-        users = User.objects.filter(username=username)
-        if users:
-            user = users[0]
-            if user.email != email:
-                raise ParseError('Имя пользователя уже существует.')
-    if not user:
-        user, created = User.objects.get_or_create(email=email,
-                                                   username=username)
+    user, created = User.objects.get_or_create(email=email,
+                                               username=username)
 
     confirmation_code = default_token_generator.make_token(user)
 
