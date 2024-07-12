@@ -1,7 +1,5 @@
 """Контроллеры."""
 
-from datetime import datetime as dt
-
 from rest_framework import viewsets, filters, status  # type: ignore
 from django.shortcuts import get_object_or_404  # type: ignore
 from django.contrib.auth import get_user_model  # type: ignore
@@ -86,7 +84,7 @@ class TitleViewSet(OrderingMixin, viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         """Выбор сериализатора."""
-        if self.action in ('list', 'retrieve',):
+        if self.action in {'list', 'retrieve'}:
             return TitleReadSerializer
         return TitleWriteSerializer
 
@@ -101,12 +99,7 @@ class ReviewViewSet(OrderingDateMixin, TextPermissionsMixin,
     def perform_create(self, serializer):
         """Создание обзора."""
         serializer.save(author=self.request.user,
-                        title=self.get_title(),
-                        pub_date=dt.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
-
-    def perform_update(self, serializer):
-        """Обновление обзора."""
-        serializer.save()
+                        title=self.get_title())
 
     def get_title(self):
         """Получение произведения."""
@@ -128,13 +121,14 @@ class CommentViewSet(OrderingDateMixin, TextPermissionsMixin,
     def perform_create(self, serializer):
         """Создание поста."""
         serializer.save(author=self.request.user,
-                        review=self.get_review(),
-                        pub_date=dt.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
+                        review=self.get_review())
 
     def get_review(self):
         """Получение отзыва."""
         review_id = self.kwargs.get('review_id')
-        return get_object_or_404(Review, id=review_id)
+        title_id = self.kwargs.get('title_id')
+        return get_object_or_404(Review, id=review_id,
+                                 title=title_id)
 
     def get_queryset(self):
         """Выбор комментариев."""

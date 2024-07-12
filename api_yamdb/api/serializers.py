@@ -74,13 +74,20 @@ class TitleReadSerializer(serializers.ModelSerializer):
                            in scores])) if scores else None
 
 
-class ReviewSerializer(serializers.ModelSerializer):
-    """Сериализатор обзоров."""
+class AuthorSerializer(serializers.ModelSerializer):
+    """Сериализатор с полем автора."""
 
     author = SlugRelatedField(
         slug_field='username',
         read_only=True,
     )
+
+    class Meta:
+        abstract = True
+
+
+class ReviewSerializer(AuthorSerializer):
+    """Сериализатор обзоров."""
 
     class Meta:
         model = Review
@@ -100,22 +107,14 @@ class ReviewSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if not request:
             raise serializers.ValidationError('Нет данных запроса.')
-        if Review.objects.filter(
-                author=request.user,
-                title=title_id,
-        ):
+        if request.user.reviews.filter(title=title_id).exists():
             raise serializers.ValidationError(
                 'Допустим только один обзор на произведение.')
         return data_to_validate
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class CommentSerializer(AuthorSerializer):
     """Сериализатор комментариев."""
-
-    author = SlugRelatedField(
-        slug_field='username',
-        read_only=True,
-    )
 
     class Meta:
         model = Comment
