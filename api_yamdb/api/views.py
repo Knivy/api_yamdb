@@ -14,7 +14,7 @@ from rest_framework_simplejwt.tokens import AccessToken  # type: ignore
 from django.conf import settings  # type: ignore
 from django.http import JsonResponse  # type: ignore
 from rest_framework.exceptions import ParseError  # type: ignore
-from rest_framework.exceptions import MethodNotAllowed  # type: ignore
+from django.db import models  # type: ignore
 
 from reviews.models import Category, Genre, Title, Review, Comment
 from .serializers import (CategorySerializer, GenreSerializer,
@@ -25,7 +25,6 @@ from users.serializers import (UserGetOrCreationSerializer,
 from .permissions import (AdminOrReadListOnlyPermission,
                           AdminOrReadOnlyPermission, TextPermission)
 from .filters import TitleFilter
-from django.db import models
 
 User = get_user_model()
 
@@ -36,10 +35,14 @@ class PermissionsMixin(viewsets.ModelViewSet):
     permission_classes = (AdminOrReadListOnlyPermission,)
 
 
-class TextPermissionsMixin(viewsets.ModelViewSet):
-    """Миксин разрешений."""
+class BaseTextViewSet(viewsets.ModelViewSet):
+    """Миксин для текстов обзоров и комментариев."""
 
     permission_classes = (TextPermission,)
+    ordering = ('-pub_date',)
+
+    class Meta:
+        abstract = True
 
 
 class OrderingMixin(viewsets.ModelViewSet):
@@ -47,15 +50,11 @@ class OrderingMixin(viewsets.ModelViewSet):
 
     ordering = ('name',)
 
-
-class OrderingDateMixin(viewsets.ModelViewSet):
-    """Миксин сортировки."""
-
-    ordering = ('-pub_date',)
+    class Meta:
+        abstract = True
 
 
-class CategoryViewSet(OrderingMixin, PermissionsMixin,
-                      viewsets.ModelViewSet):
+class CategoryViewSet(OrderingMixin, PermissionsMixin):
     """Обработка категорий."""
 
     queryset = Category.objects.all()
@@ -65,8 +64,7 @@ class CategoryViewSet(OrderingMixin, PermissionsMixin,
     lookup_field = 'slug'  # Чтобы адрес был вида /categories/{slug}/
 
 
-class GenreViewSet(OrderingMixin, PermissionsMixin,
-                   viewsets.ModelViewSet):
+class GenreViewSet(OrderingMixin, PermissionsMixin):
     """Обработка жанров."""
 
     queryset = Genre.objects.all()
@@ -76,12 +74,14 @@ class GenreViewSet(OrderingMixin, PermissionsMixin,
     lookup_field = 'slug'
 
 
-class TitleViewSet(OrderingMixin, viewsets.ModelViewSet):
+class TitleViewSet(OrderingMixin):
     """Обработка произведений."""
 
     permission_classes = (AdminOrReadOnlyPermission,)
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filterset_class = TitleFilter
+    http_method_names = ('get', 'post', 'patch', 'delete')
+    ordering_fields = ('name', 'year', 'rating')
 
     def get_serializer_class(self):
         """Выбор сериализатора."""
@@ -98,8 +98,7 @@ class TitleViewSet(OrderingMixin, viewsets.ModelViewSet):
         return Title.objects.all()
 
 
-class ReviewViewSet(OrderingDateMixin, TextPermissionsMixin,
-                    viewsets.ModelViewSet):
+class ReviewViewSet(BaseTextViewSet):
     """Обработка обзоров."""
 
     serializer_class = ReviewSerializer
@@ -120,8 +119,7 @@ class ReviewViewSet(OrderingDateMixin, TextPermissionsMixin,
         return self.get_title().reviews.all()
 
 
-class CommentViewSet(OrderingDateMixin, TextPermissionsMixin,
-                     viewsets.ModelViewSet):
+class CommentViewSet(BaseTextViewSet):
     """Обработка комментариев."""
 
     serializer_class = CommentSerializer
