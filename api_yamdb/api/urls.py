@@ -4,8 +4,8 @@ from django.urls import include, path  # type: ignore
 from rest_framework import routers  # type: ignore
 from .views import (CategoryViewSet, GenreViewSet,
                     ReviewViewSet, CommentViewSet, TitleViewSet,
-                    get_jwt_token, send_confirmation_code)
-from users.views import UserViewSet
+                    get_jwt_token, send_confirmation_code,
+                    UserViewSet)
 
 app_name: str = 'api'
 

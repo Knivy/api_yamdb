@@ -1,7 +1,5 @@
 """Контроллеры."""
 
-from datetime import datetime as dt
-
 from rest_framework import viewsets, filters, status  # type: ignore
 from django.shortcuts import get_object_or_404  # type: ignore
 from django.contrib.auth import get_user_model  # type: ignore
@@ -10,21 +8,26 @@ from django.contrib.auth.tokens import default_token_generator  # type: ignore
 from django.core.mail import send_mail  # type: ignore
 from rest_framework.decorators import (  # type: ignore
     api_view, permission_classes)
-from rest_framework.permissions import AllowAny  # type: ignore
+from rest_framework.permissions import (AllowAny,  # type: ignore
+                                        IsAuthenticated)
 from rest_framework.response import Response  # type: ignore
 from rest_framework_simplejwt.tokens import AccessToken  # type: ignore
 from django.conf import settings  # type: ignore
 from django.http import JsonResponse  # type: ignore
-from rest_framework.exceptions import ParseError  # type: ignore
+from django.db import models  # type: ignore
+from rest_framework.decorators import action  # type: ignore
 
 from reviews.models import Category, Genre, Title, Review, Comment
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleReadSerializer, TitleWriteSerializer,
                           ReviewSerializer, CommentSerializer)
-from users.serializers import (UserGetOrCreationSerializer,
-                               ConfirmationCodeSerializer)
+from .serializers import (UserGetOrCreationSerializer,
+                          ConfirmationCodeSerializer,
+                          UserSerializer, SingleUserSerializer
+                          )
 from .permissions import (AdminOrReadListOnlyPermission,
-                          AdminOrReadOnlyPermission, TextPermission)
+                          AdminOrReadOnlyPermission, TextPermission,
+                          AdminOnlyPermission)
 from .filters import TitleFilter
 
 User = get_user_model()
@@ -36,10 +39,14 @@ class PermissionsMixin(viewsets.ModelViewSet):
     permission_classes = (AdminOrReadListOnlyPermission,)
 
 
-class TextPermissionsMixin(viewsets.ModelViewSet):
-    """Миксин разрешений."""
+class BaseTextViewSet(viewsets.ModelViewSet):
+    """Миксин для текстов обзоров и комментариев."""
 
     permission_classes = (TextPermission,)
+    ordering = ('-pub_date',)
+
+    class Meta:
+        abstract = True
 
 
 class OrderingMixin(viewsets.ModelViewSet):
@@ -47,15 +54,11 @@ class OrderingMixin(viewsets.ModelViewSet):
 
     ordering = ('name',)
 
-
-class OrderingDateMixin(viewsets.ModelViewSet):
-    """Миксин сортировки."""
-
-    ordering = ('-pub_date',)
+    class Meta:
+        abstract = True
 
 
-class CategoryViewSet(OrderingMixin, PermissionsMixin,
-                      viewsets.ModelViewSet):
+class CategoryViewSet(OrderingMixin, PermissionsMixin):
     """Обработка категорий."""
 
     queryset = Category.objects.all()
@@ -65,8 +68,7 @@ class CategoryViewSet(OrderingMixin, PermissionsMixin,
     lookup_field = 'slug'  # Чтобы адрес был вида /categories/{slug}/
 
 
-class GenreViewSet(OrderingMixin, PermissionsMixin,
-                   viewsets.ModelViewSet):
+class GenreViewSet(OrderingMixin, PermissionsMixin):
     """Обработка жанров."""
 
     queryset = Genre.objects.all()
@@ -76,23 +78,31 @@ class GenreViewSet(OrderingMixin, PermissionsMixin,
     lookup_field = 'slug'
 
 
-class TitleViewSet(OrderingMixin, viewsets.ModelViewSet):
+class TitleViewSet(OrderingMixin):
     """Обработка произведений."""
 
-    queryset = Title.objects.all()
     permission_classes = (AdminOrReadOnlyPermission,)
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filterset_class = TitleFilter
+    http_method_names = ('get', 'post', 'patch', 'delete')
+    ordering_fields = ('name', 'year', 'rating')
 
     def get_serializer_class(self):
         """Выбор сериализатора."""
-        if self.action in ('list', 'retrieve',):
+        if self.action in {'list', 'retrieve'}:
             return TitleReadSerializer
         return TitleWriteSerializer
 
+    def get_queryset(self):
+        """Набор произведений."""
+        if self.action in {'list', 'retrieve'}:
+            return Title.objects.annotate(
+                rating=models.Avg('reviews__score')
+            )
+        return Title.objects.all()
 
-class ReviewViewSet(OrderingDateMixin, TextPermissionsMixin,
-                    viewsets.ModelViewSet):
+
+class ReviewViewSet(BaseTextViewSet):
     """Обработка обзоров."""
 
     serializer_class = ReviewSerializer
@@ -101,12 +111,7 @@ class ReviewViewSet(OrderingDateMixin, TextPermissionsMixin,
     def perform_create(self, serializer):
         """Создание обзора."""
         serializer.save(author=self.request.user,
-                        title=self.get_title(),
-                        pub_date=dt.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
-
-    def perform_update(self, serializer):
-        """Обновление обзора."""
-        serializer.save()
+                        title=self.get_title())
 
     def get_title(self):
         """Получение произведения."""
@@ -118,8 +123,7 @@ class ReviewViewSet(OrderingDateMixin, TextPermissionsMixin,
         return self.get_title().reviews.all()
 
 
-class CommentViewSet(OrderingDateMixin, TextPermissionsMixin,
-                     viewsets.ModelViewSet):
+class CommentViewSet(BaseTextViewSet):
     """Обработка комментариев."""
 
     serializer_class = CommentSerializer
@@ -128,43 +132,31 @@ class CommentViewSet(OrderingDateMixin, TextPermissionsMixin,
     def perform_create(self, serializer):
         """Создание поста."""
         serializer.save(author=self.request.user,
-                        review=self.get_review(),
-                        pub_date=dt.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
+                        review=self.get_review())
 
     def get_review(self):
         """Получение отзыва."""
         review_id = self.kwargs.get('review_id')
-        return get_object_or_404(Review, id=review_id)
+        title_id = self.kwargs.get('title_id')
+        return get_object_or_404(Review, id=review_id,
+                                 title=title_id)
 
     def get_queryset(self):
         """Выбор комментариев."""
         return self.get_review().comments.all()
 
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
+@api_view(('POST',))
+@permission_classes((AllowAny,))
 def send_confirmation_code(request):
     serializer = UserGetOrCreationSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
-    email = serializer.data['email']
-    username = serializer.data['username']
+    email = serializer.validated_data.get('email')
+    username = serializer.validated_data.get('username')
 
-    users = User.objects.filter(email=email)
-    user = None
-    if users:
-        user = users[0]
-        if user.username != username:
-            raise ParseError('Емайл уже существует.')
-    else:
-        users = User.objects.filter(username=username)
-        if users:
-            user = users[0]
-            if user.email != email:
-                raise ParseError('Имя пользователя уже существует.')
-    if not user:
-        user, created = User.objects.get_or_create(email=email,
-                                                   username=username)
+    user, created = User.objects.get_or_create(email=email,
+                                               username=username)
 
     confirmation_code = default_token_generator.make_token(user)
 
@@ -176,7 +168,7 @@ def send_confirmation_code(request):
         fail_silently=False
     )
 
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.validated_data)
 
 
 @api_view(['POST'])
@@ -185,22 +177,48 @@ def get_jwt_token(request):
     serializer = ConfirmationCodeSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
-    username = serializer.data.get('username')
-    confirmation_code = serializer.data.get('confirmation_code')
-
+    username = serializer.validated_data.get('username')
     user = get_object_or_404(User, username=username)
-
-    if default_token_generator.check_token(user, confirmation_code):
-        token = AccessToken.for_user(user)
-        return Response(
-            {'token': str(token)}, status=status.HTTP_200_OK
+    token = AccessToken.for_user(user)
+    return Response(
+            {'token': str(token)}
         )
-
-    return Response({'confirmation_code': 'Неверный код подтверждения'},
-                    status=status.HTTP_400_BAD_REQUEST)
 
 
 def page_not_found(request, exception) -> JsonResponse:
     """Ошибка 404: Объект не найден."""
-    return JsonResponse({"message": "Объект не найден."},
+    return JsonResponse({'message': 'Объект не найден.'},
                         status=status.HTTP_404_NOT_FOUND)
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (AdminOnlyPermission,)
+    lookup_field = 'username'
+    http_method_names = ('get', 'post', 'patch', 'delete')
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('=username',)
+
+    @action(
+        detail=False,
+        methods=('patch',),
+        permission_classes=(IsAuthenticated,)
+    )
+    def me(self, request):
+        user = request.user
+        serializer = self.get_serializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    @me.mapping.get
+    def get_me(self, request):
+        user = request.user
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
+
+    def get_serializer_class(self):
+        if self.action == 'me':
+            return SingleUserSerializer
+        return super().get_serializer_class()

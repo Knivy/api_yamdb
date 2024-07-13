@@ -1,7 +1,13 @@
 """Модели."""
 
+from datetime import datetime as dt
+
 from django.db import models  # type: ignore
 from django.contrib.auth import get_user_model  # type: ignore
+from django.core.validators import (MaxValueValidator,  # type: ignore
+                                    MaxLengthValidator,
+                                    MinValueValidator)
+
 from .constants import (MAX_NAME_LENGTH, MAX_SLUG_LENGTH,
                         MIN_SCORE, MAX_SCORE)
 
@@ -13,6 +19,7 @@ class BaseNameModel(models.Model):
     """Базовая модель с именем."""
 
     name = models.CharField(max_length=MAX_NAME_LENGTH,
+                            validators=(MaxLengthValidator,),
                             verbose_name='Название')
 
     class Meta:
@@ -27,6 +34,7 @@ class BaseNameSlugModel(BaseNameModel):
     """Базовая модель с именем и слагом."""
 
     slug = models.SlugField(unique=True, max_length=MAX_SLUG_LENGTH,
+                            validators=(MaxLengthValidator,),
                             verbose_name='Слаг')
 
     class Meta(BaseNameModel.Meta):
@@ -52,8 +60,11 @@ class Genre(BaseNameSlugModel):
 class Title(BaseNameModel):
     """Произведения искусства."""
 
-    year = models.PositiveSmallIntegerField(verbose_name='Год')
-    description = models.TextField(blank=True, null=True,
+    year = models.SmallIntegerField(verbose_name='Год',
+                                    validators=(MaxValueValidator(
+                                        limit_value=dt.now().year
+                                    ),))
+    description = models.TextField(blank=True,
                                    verbose_name='Описание')
     genre = models.ManyToManyField(
         Genre, related_name='titles',
@@ -72,7 +83,8 @@ class BaseTextModel(models.Model):
 
     text = models.TextField(verbose_name='Текст')
     pub_date = models.DateTimeField(verbose_name='Дата публикации',
-                                    auto_now_add=True)
+                                    auto_now_add=True,
+                                    db_index=True)
 
     class Meta:
         abstract = True
@@ -86,8 +98,8 @@ class Review(BaseTextModel):
     """Отзывы."""
 
     score = models.PositiveSmallIntegerField(
-        choices=tuple((i, str(i)) for i in range(MIN_SCORE,
-                                                 MAX_SCORE + 1)),
+        validators=(MinValueValidator(MIN_SCORE),
+                    MaxValueValidator(MAX_SCORE)),
         verbose_name='Оценка')
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='reviews',
