@@ -182,8 +182,8 @@ def get_jwt_token(request):
     user = get_object_or_404(User, username=username)
     token = AccessToken.for_user(user)
     return Response(
-            {'token': str(token)}
-        )
+        {'token': str(token)}
+    )
 
 
 def page_not_found(request, exception) -> JsonResponse:
