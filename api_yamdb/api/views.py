@@ -8,21 +8,26 @@ from django.contrib.auth.tokens import default_token_generator  # type: ignore
 from django.core.mail import send_mail  # type: ignore
 from rest_framework.decorators import (  # type: ignore
     api_view, permission_classes)
-from rest_framework.permissions import AllowAny  # type: ignore
+from rest_framework.permissions import (AllowAny,  # type: ignore
+                                        IsAuthenticated)
 from rest_framework.response import Response  # type: ignore
 from rest_framework_simplejwt.tokens import AccessToken  # type: ignore
 from django.conf import settings  # type: ignore
 from django.http import JsonResponse  # type: ignore
 from django.db import models  # type: ignore
+from rest_framework.decorators import action  # type: ignore
 
 from reviews.models import Category, Genre, Title, Review, Comment
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleReadSerializer, TitleWriteSerializer,
                           ReviewSerializer, CommentSerializer)
-from users.serializers import (UserGetOrCreationSerializer,
-                               ConfirmationCodeSerializer)
+from .serializers import (UserGetOrCreationSerializer,
+                          ConfirmationCodeSerializer,
+                          UserSerializer, SingleUserSerializer
+                          )
 from .permissions import (AdminOrReadListOnlyPermission,
-                          AdminOrReadOnlyPermission, TextPermission)
+                          AdminOrReadOnlyPermission, TextPermission,
+                          AdminOnlyPermission)
 from .filters import TitleFilter
 
 User = get_user_model()
@@ -87,7 +92,7 @@ class TitleViewSet(OrderingMixin):
         if self.action in {'list', 'retrieve'}:
             return TitleReadSerializer
         return TitleWriteSerializer
-    
+
     def get_queryset(self):
         """Набор произведений."""
         if self.action in {'list', 'retrieve'}:
@@ -184,3 +189,36 @@ def page_not_found(request, exception) -> JsonResponse:
     """Ошибка 404: Объект не найден."""
     return JsonResponse({'message': 'Объект не найден.'},
                         status=status.HTTP_404_NOT_FOUND)
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (AdminOnlyPermission,)
+    lookup_field = 'username'
+    http_method_names = ('get', 'post', 'patch', 'delete')
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('=username',)
+
+    @action(
+        detail=False,
+        methods=('patch',),
+        permission_classes=(IsAuthenticated,)
+    )
+    def me(self, request):
+        user = request.user
+        serializer = self.get_serializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    @me.mapping.get
+    def get_me(self, request):
+        user = request.user
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
+
+    def get_serializer_class(self):
+        if self.action == 'me':
+            return SingleUserSerializer
+        return super().get_serializer_class()

@@ -1,6 +1,7 @@
 from rest_framework.permissions import (  # type: ignore
     SAFE_METHODS, BasePermission)
 from rest_framework.exceptions import MethodNotAllowed  # type: ignore
+from rest_framework.permissions import IsAuthenticated  # type: ignore
 
 
 class AdminOrReadListOnlyPermission(BasePermission):
@@ -13,7 +14,7 @@ class AdminOrReadListOnlyPermission(BasePermission):
         if not request.user.is_authenticated:
             return False
         if request.method in {'POST', 'DELETE'}:
-            return request.user.is_admin
+            return request.user.is_superuser_or_admin
         if (request.method == 'PATCH'
            and (request.user.is_user or request.user.is_moderator)):
             return False
@@ -27,9 +28,8 @@ class AdminOrReadOnlyPermission(BasePermission):
         """Проверка метода."""
         if request.method in SAFE_METHODS:
             return True
-        if request.method in {'POST', 'PATCH', 'DELETE'}:
-            return request.user.is_authenticated and request.user.is_admin
-        raise MethodNotAllowed(request.method)
+        return (request.user.is_authenticated
+                and request.user.is_superuser_or_admin)
 
 
 class TextPermission(BasePermission):
@@ -47,7 +47,27 @@ class TextPermission(BasePermission):
         """Доступ к объектам."""
         if request.method in SAFE_METHODS:
             return True
-        return (request.user.is_authenticated 
-                and (request.user.is_admin
-                     or request.user == text_object.author
-                     or request.user.is_moderator))
+        return (request.user.is_authenticated
+                and (request.user.is_moderator_or_higher
+                     or request.user == text_object.author))
+
+
+class AdminOnlyPermission(BasePermission):
+    """Только  для админа."""
+
+    def has_permission(self, request, view):
+        """Проверка."""
+        return (request.user.is_authenticated
+                and request.user.is_superuser_or_admin)
+
+
+class AuthenticatedOnlyPermission(IsAuthenticated):
+    """Только  для аутентифицированных."""
+
+    def has_permission(self, request, view):
+        """Проверка."""
+        if not request.user.is_authenticated:
+            return False
+        if request.method not in {'POST', 'PATCH', 'GET'}:
+            raise MethodNotAllowed(request.method)
+        return True
