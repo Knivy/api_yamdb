@@ -44,6 +44,7 @@ class BaseTextViewSet(viewsets.ModelViewSet):
 
     permission_classes = (TextPermission,)
     ordering = ('-pub_date',)
+    http_method_names = ('get', 'post', 'patch', 'delete')
 
     class Meta:
         abstract = True

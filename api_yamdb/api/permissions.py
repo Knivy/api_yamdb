@@ -39,8 +39,6 @@ class TextPermission(BasePermission):
         """Проверка метода."""
         if request.method in SAFE_METHODS:
             return True
-        if request.method == 'PUT':
-            raise MethodNotAllowed(request.method)
         return request.user.is_authenticated
 
     def has_object_permission(self, request, view, text_object):
