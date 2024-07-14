@@ -25,67 +25,75 @@ from .serializers import (UserGetOrCreationSerializer,
                           ConfirmationCodeSerializer,
                           UserSerializer, SingleUserSerializer
                           )
-from .permissions import (AdminOrReadListOnlyPermission,
-                          AdminOrReadOnlyPermission, TextPermission,
-                          AdminOnlyPermission)
+from .permissions import (AdminOrReadOnlyPermission, TextPermission,
+                          AdminOnlyPermission, NotUserModeratorPermission,
+                          ForbiddenPermission)
 from .filters import TitleFilter
 
 User = get_user_model()
 
 
-class PermissionsMixin(viewsets.ModelViewSet):
-    """Миксин разрешений."""
-
-    permission_classes = (AdminOrReadListOnlyPermission,)
-
-
-class BaseTextViewSet(viewsets.ModelViewSet):
-    """Миксин для текстов обзоров и комментариев."""
-
-    permission_classes = (TextPermission,)
-    ordering = ('-pub_date',)
+class HttpNoPUTMethodsMixin:
+    """Миксин доступных методов."""
     http_method_names = ('get', 'post', 'patch', 'delete')
 
-    class Meta:
-        abstract = True
 
-
-class OrderingMixin(viewsets.ModelViewSet):
+class OrderingMixin:
     """Миксин сортировки."""
 
     ordering = ('name',)
 
-    class Meta:
-        abstract = True
+
+class BaseTextViewSet(HttpNoPUTMethodsMixin, viewsets.ModelViewSet):
+    """Базовый вьюсет для текстов обзоров и комментариев."""
+
+    permission_classes = (TextPermission,)
+    ordering = ('-pub_date',)
 
 
-class CategoryViewSet(OrderingMixin, PermissionsMixin):
-    """Обработка категорий."""
+class BaseTagViewset(HttpNoPUTMethodsMixin, OrderingMixin,
+                     viewsets.ModelViewSet):
+    """Базовый вьюсет для категорий и жанров."""
 
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'  # Чтобы адрес был вида /categories/{slug}/
 
+    def get_permissions(self):
+        """Разрешения."""
+        if self.action == 'list':
+            self.permission_classes = (AllowAny,)
+        elif self.action in {'create', 'destroy'}:
+            self.permission_classes = (AdminOnlyPermission,)
+        elif self.action == 'partial_update':
+            self.permission_classes = (NotUserModeratorPermission,)
+        else:
+            self.permission_classes = (ForbiddenPermission,)
+        return super().get_permissions()
 
-class GenreViewSet(OrderingMixin, PermissionsMixin):
+
+class CategoryViewSet(BaseTagViewset):
+    """Обработка категорий."""
+
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class GenreViewSet(BaseTagViewset):
     """Обработка жанров."""
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
-    lookup_field = 'slug'
 
 
-class TitleViewSet(OrderingMixin):
+class TitleViewSet(HttpNoPUTMethodsMixin,
+                   OrderingMixin,
+                   viewsets.ModelViewSet):
     """Обработка произведений."""
 
     permission_classes = (AdminOrReadOnlyPermission,)
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filterset_class = TitleFilter
-    http_method_names = ('get', 'post', 'patch', 'delete')
     ordering_fields = ('name', 'year', 'rating')
 
     def get_serializer_class(self):
@@ -165,15 +173,15 @@ def send_confirmation_code(request):
         'Код подтверждения',
         f'Ваш код подтверждения: {confirmation_code}',
         settings.DEFAULT_FROM_EMAIL,
-        [email],
+        (email,),
         fail_silently=False
     )
 
     return Response(serializer.validated_data)
 
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
+@api_view(('POST',))
+@permission_classes((AllowAny,))
 def get_jwt_token(request):
     serializer = ConfirmationCodeSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -192,12 +200,11 @@ def page_not_found(request, exception) -> JsonResponse:
                         status=status.HTTP_404_NOT_FOUND)
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(HttpNoPUTMethodsMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (AdminOnlyPermission,)
     lookup_field = 'username'
-    http_method_names = ('get', 'post', 'patch', 'delete')
     filter_backends = (filters.SearchFilter,)
     search_fields = ('=username',)
 

@@ -11,7 +11,7 @@ class TitleFilter(filters.FilterSet):
                                lookup_expr='iexact')
     category = filters.CharFilter(field_name='category__slug',
                                   lookup_expr='iexact')
-    name = filters.CharFilter(field_name='name', lookup_expr='icontains')
+    name = filters.CharFilter(lookup_expr='icontains')
 
     class Meta:
         model = Title
