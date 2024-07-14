@@ -35,6 +35,7 @@ User = get_user_model()
 
 class HttpNoPUTMethodsMixin:
     """Миксин доступных методов."""
+
     http_method_names = ('get', 'post', 'patch', 'delete')
 
 
