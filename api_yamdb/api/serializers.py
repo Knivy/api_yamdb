@@ -57,7 +57,7 @@ class TitleWriteSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         """Представление объекта."""
-        return TitleReadSerializer().to_representation(instance)
+        return TitleReadSerializer(self).to_representation(instance)
 
 
 class TitleReadSerializer(serializers.ModelSerializer):
@@ -133,11 +133,8 @@ class CommentSerializer(AuthorSerializer):
                   'pub_date')
 
 
-class UsernameEmailValidationSerializer(serializers.Serializer):
+class UsernameEmailValidationSerializer():
     """Сериализатор валидации логина и емайла."""
-
-    class Meta:
-        abstract = True
 
     def validate_username(self, username):
         """Проверка логина."""
@@ -166,7 +163,8 @@ class SingleUserSerializer(UserSerializer):
         read_only_fields = ('role',)
 
 
-class UserGetOrCreationSerializer(UsernameEmailValidationSerializer):
+class UserGetOrCreationSerializer(UsernameEmailValidationSerializer,
+                                  serializers.Serializer):
     email = serializers.EmailField()
     username = serializers.CharField()
 
@@ -174,19 +172,13 @@ class UserGetOrCreationSerializer(UsernameEmailValidationSerializer):
         """Проверка существования пользователя."""
         email = data_to_validate.get('email')
         username = data_to_validate.get('username')
-        users = User.objects.filter(email=email)
-        user = None
-        if users:
-            user = users[0]
-            if user.username != username:
-                raise serializers.ValidationError('Емайл уже существует.')
-        else:
-            users = User.objects.filter(username=username)
-            if users:
-                user = users[0]
-                if user.email != email:
-                    raise serializers.ValidationError(
-                        'Имя пользователя уже существует.')
+        if (User.objects.filter(email=email)
+                        .exclude(username=username).exists()):
+            raise serializers.ValidationError('Емайл уже существует.')
+        if (User.objects.filter(username=username)
+                        .exclude(email=email).exists()):
+            raise serializers.ValidationError(
+                'Имя пользователя уже существует.')
         return data_to_validate
 
 

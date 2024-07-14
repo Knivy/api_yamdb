@@ -62,8 +62,9 @@ class Title(BaseNameModel):
 
     year = models.SmallIntegerField(verbose_name='Год',
                                     validators=(MaxValueValidator(
-                                        limit_value=dt.now().year
-                                    ),))
+                                        limit_value=lambda: dt.now().year
+                                    ),),
+                                    db_index=True)
     description = models.TextField(blank=True,
                                    verbose_name='Описание')
     genre = models.ManyToManyField(
