@@ -57,7 +57,8 @@ class TitleWriteSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         """Представление объекта."""
-        return TitleReadSerializer(self).to_representation(instance)
+        return (TitleReadSerializer(self, context=self.context)
+                .to_representation(instance))
 
 
 class TitleReadSerializer(serializers.ModelSerializer):
@@ -133,7 +134,7 @@ class CommentSerializer(AuthorSerializer):
                   'pub_date')
 
 
-class UsernameEmailValidationSerializer():
+class UsernameEmailValidationSerializer:
     """Сериализатор валидации логина и емайла."""
 
     def validate_username(self, username):
