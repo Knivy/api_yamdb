@@ -116,7 +116,6 @@ class ReviewViewSet(BaseTextViewSet):
     """Обработка обзоров."""
 
     serializer_class = ReviewSerializer
-    queryset = Review.objects.all()
 
     def perform_create(self, serializer):
         """Создание обзора."""
@@ -137,7 +136,6 @@ class CommentViewSet(BaseTextViewSet):
     """Обработка комментариев."""
 
     serializer_class = CommentSerializer
-    queryset = Comment.objects.all()
 
     def perform_create(self, serializer):
         """Создание поста."""
